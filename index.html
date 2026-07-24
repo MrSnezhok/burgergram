@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Burgergram</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -12,6 +12,7 @@
             padding: 0;
             box-sizing: border-box;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
@@ -21,15 +22,16 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 10px;
         }
         
         #app {
             width: 100%;
             max-width: 1200px;
-            height: 90vh;
+            height: 95vh;
+            max-height: 800px;
             background: #1a1a2e;
-            border-radius: 24px;
+            border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.8);
             display: flex;
             flex-direction: column;
@@ -48,108 +50,94 @@
         
         .auth-card {
             background: #16213e;
-            border-radius: 32px;
-            padding: 40px 36px;
+            border-radius: 24px;
+            padding: 30px 28px;
             width: 100%;
-            max-width: 400px;
+            max-width: 380px;
             box-shadow: 0 12px 40px rgba(0,0,0,0.6);
             border: 1px solid #2a3a5e;
         }
         
         .auth-card h2 {
             font-weight: 700;
-            font-size: 28px;
-            margin-bottom: 8px;
+            font-size: 26px;
+            margin-bottom: 6px;
             color: #ffffff;
         }
-        
-        .auth-card h2 .burger-icon {
-            color: #f5a623;
-        }
-        
+        .auth-card h2 .burger-icon { color: #f5a623; }
         .auth-card p.sub {
             color: #8899bb;
-            font-size: 14px;
-            margin-bottom: 28px;
+            font-size: 13px;
+            margin-bottom: 24px;
         }
-        
         .auth-card label {
             display: block;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
             color: #8899bb;
-            margin: 16px 0 6px 4px;
+            margin: 12px 0 4px 4px;
         }
-        
         .auth-card input {
             width: 100%;
-            padding: 14px 18px;
+            padding: 12px 16px;
             background: #0d1b2a;
             border: 1px solid #2a3a5e;
             border-radius: 12px;
             color: #f0f4fa;
-            font-size: 15px;
+            font-size: 14px;
             outline: none;
             transition: 0.2s;
         }
-        
         .auth-card input:focus {
             border-color: #4f8cf7;
             box-shadow: 0 0 0 3px rgba(79, 140, 247, 0.2);
         }
-        
         .auth-card .actions {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-top: 28px;
+            gap: 10px;
+            margin-top: 20px;
         }
-        
         .btn-primary {
             background: #4f8cf7;
             border: none;
-            padding: 14px;
+            padding: 12px;
             border-radius: 12px;
             font-weight: 600;
             color: #fff;
-            font-size: 16px;
+            font-size: 15px;
             cursor: pointer;
             transition: 0.15s;
         }
-        
         .btn-primary:hover { background: #3a73e0; transform: scale(0.98); }
-        
         .btn-outline {
             background: transparent;
             border: 1px solid #2a3a5e;
-            padding: 12px;
+            padding: 10px;
             border-radius: 12px;
             font-weight: 500;
             color: #8899bb;
             cursor: pointer;
             transition: 0.15s;
         }
-        
         .btn-outline:hover { background: #1a2a4e; border-color: #4f8cf7; }
-        
         .auth-error {
             background: #3d1e2a;
             color: #f79cb0;
-            padding: 10px 14px;
-            border-radius: 12px;
-            font-size: 13px;
-            margin-top: 16px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 12px;
             text-align: center;
             border-left: 3px solid #e4566a;
         }
-        
         .auth-success {
             background: #1a3a2a;
             color: #7ddfa0;
-            padding: 10px 14px;
-            border-radius: 12px;
-            font-size: 13px;
-            margin-top: 16px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 12px;
             text-align: center;
             border-left: 3px solid #4ade80;
         }
@@ -166,8 +154,9 @@
             width: 100%;
         }
         
+        /* САЙДБАР */
         .sidebar {
-            width: 320px;
+            width: 280px;
             background: #16213e;
             border-right: 1px solid #2a3a5e;
             display: flex;
@@ -176,81 +165,104 @@
         }
         
         .sidebar-header {
-            padding: 18px 20px;
+            padding: 14px 16px;
             border-bottom: 1px solid #2a3a5e;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
         }
-        
         .sidebar-header h3 {
             font-weight: 700;
-            font-size: 20px;
+            font-size: 18px;
             color: #ffffff;
         }
-        
-        .sidebar-header h3 i {
-            color: #f5a623;
-        }
-        
+        .sidebar-header h3 i { color: #f5a623; }
         .sidebar-header .user-badge {
             background: #1a2a4e;
-            padding: 6px 14px 6px 12px;
-            border-radius: 12px;
-            font-size: 13px;
+            padding: 4px 10px 4px 8px;
+            border-radius: 10px;
+            font-size: 12px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             color: #c8d4e6;
             cursor: pointer;
             transition: 0.15s;
             border: 1px solid transparent;
         }
-        
-        .sidebar-header .user-badge:hover {
-            border-color: #4f8cf7;
-        }
-        
+        .sidebar-header .user-badge:hover { border-color: #4f8cf7; }
         .sidebar-header .user-badge i { color: #4f8cf7; }
-        
         .logout-btn {
             background: none;
             border: none;
             color: #8899bb;
-            font-size: 18px;
+            font-size: 16px;
             cursor: pointer;
-            padding: 6px 10px;
-            border-radius: 12px;
+            padding: 4px 8px;
+            border-radius: 10px;
             transition: 0.15s;
         }
-        
         .logout-btn:hover { background: #1a2a4e; color: #f0f4fa; }
+        
+        /* ВКЛАДКИ ЧАТОВ */
+        .chat-tabs {
+            display: flex;
+            border-bottom: 1px solid #2a3a5e;
+            background: #0d1b2a;
+        }
+        .chat-tabs button {
+            flex: 1;
+            padding: 10px 4px;
+            background: none;
+            border: none;
+            color: #8899bb;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.15s;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+        }
+        .chat-tabs button.active {
+            color: #4f8cf7;
+            border-bottom-color: #4f8cf7;
+        }
+        .chat-tabs button:hover { background: #1a2a4e; }
         
         .contact-list {
             flex: 1;
             overflow-y: auto;
-            padding: 8px 0;
+            padding: 4px 0;
         }
         
         .contact-item {
             display: flex;
             align-items: center;
-            gap: 14px;
-            padding: 12px 20px;
+            gap: 10px;
+            padding: 10px 14px;
             cursor: pointer;
             transition: 0.1s;
             border-left: 3px solid transparent;
         }
-        
         .contact-item:hover { background: #1a2a4e; }
         .contact-item.active {
             background: #1a2a4e;
             border-left-color: #4f8cf7;
         }
-        
+        .contact-item .unread-badge {
+            background: #4f8cf7;
+            color: #fff;
+            border-radius: 50%;
+            padding: 1px 6px;
+            font-size: 10px;
+            margin-left: auto;
+            min-width: 18px;
+            text-align: center;
+        }
         .contact-avatar {
-            width: 44px;
-            height: 44px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             background: #2a3a5e;
             display: flex;
@@ -259,141 +271,133 @@
             font-weight: 600;
             color: #b8ccf0;
             text-transform: uppercase;
-            font-size: 18px;
+            font-size: 16px;
             flex-shrink: 0;
             position: relative;
             overflow: hidden;
         }
-        
         .contact-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        
         .contact-avatar .online-dot {
             position: absolute;
-            bottom: 2px;
-            right: 2px;
-            width: 12px;
-            height: 12px;
+            bottom: 1px;
+            right: 1px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             border: 2px solid #16213e;
         }
-        
-        .contact-avatar .online-dot.online {
-            background: #4ade80;
-        }
-        
-        .contact-avatar .online-dot.offline {
-            background: #666;
-        }
+        .contact-avatar .online-dot.online { background: #4ade80; }
+        .contact-avatar .online-dot.offline { background: #666; }
         
         .contact-info {
             flex: 1;
             overflow: hidden;
+            min-width: 0;
         }
-        
         .contact-name {
             font-weight: 500;
             color: #e8edf5;
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 15px;
+            gap: 4px;
+            font-size: 14px;
+            flex-wrap: wrap;
         }
-        
-        .contact-name .verified-icon {
-            color: #4ade80;
-            font-size: 12px;
+        .contact-name .verified-icon { color: #4ade80; font-size: 11px; }
+        .contact-name .chat-type-badge {
+            font-size: 9px;
+            background: #2a3a5e;
+            padding: 1px 6px;
+            border-radius: 8px;
+            color: #8899bb;
         }
-        
         .contact-lastmsg {
-            font-size: 13px;
+            font-size: 12px;
             color: #8899bb;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        
         .contact-time {
-            font-size: 11px;
+            font-size: 10px;
             color: #667799;
             margin-left: auto;
+            flex-shrink: 0;
         }
         
+        /* ЧАТ */
         .chat-area {
             flex: 1;
             display: flex;
             flex-direction: column;
             background: #0d1b2a;
+            min-width: 0;
         }
-        
         .chat-header {
-            padding: 16px 24px;
+            padding: 12px 16px;
             background: #16213e;
             border-bottom: 1px solid #2a3a5e;
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 10px;
+            flex-wrap: wrap;
         }
-        
         .chat-header .chat-partner {
             font-weight: 500;
-            font-size: 18px;
+            font-size: 16px;
             color: #eef3fa;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            flex: 1;
+            min-width: 0;
         }
-        
-        .chat-header .chat-partner .verified-icon {
-            color: #4ade80;
-            font-size: 14px;
-        }
-        
+        .chat-header .chat-partner .verified-icon { color: #4ade80; font-size: 13px; }
         .chat-header .chat-actions {
-            margin-left: auto;
             display: flex;
-            gap: 8px;
+            gap: 4px;
+            flex-shrink: 0;
         }
-        
         .chat-header .chat-actions button {
             background: none;
             border: none;
             color: #8899bb;
             cursor: pointer;
-            padding: 6px 10px;
+            padding: 4px 8px;
             border-radius: 8px;
             transition: 0.15s;
-            font-size: 14px;
+            font-size: 13px;
         }
-        
         .chat-header .chat-actions button:hover {
             background: #1a2a4e;
             color: #f0f4fa;
         }
-        
         .chat-header .typing-status {
-            font-size: 12px;
+            font-size: 11px;
             color: #8899bb;
-            margin-left: 12px;
+            width: 100%;
+            order: 3;
+            margin-top: 2px;
+            min-height: 16px;
         }
         
         .messages-container {
             flex: 1;
             overflow-y: auto;
-            padding: 20px 24px;
+            padding: 12px 16px;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 2px;
         }
-        
         .message {
-            max-width: 70%;
-            padding: 10px 16px;
-            border-radius: 16px;
-            font-size: 15px;
+            max-width: 80%;
+            padding: 8px 12px;
+            border-radius: 14px;
+            font-size: 14px;
             line-height: 1.4;
             word-wrap: break-word;
             background: #1a2a4e;
@@ -402,147 +406,238 @@
             margin-bottom: 2px;
             position: relative;
         }
-        
         .message.own {
             background: #4f8cf7;
             color: white;
             align-self: flex-end;
         }
-        
         .message .msg-sender {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: #8899bb;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
-        
         .message.own .msg-sender { color: #b6ceff; }
-        
         .message .msg-time {
-            font-size: 10px;
+            font-size: 9px;
             opacity: 0.6;
-            margin-top: 4px;
+            margin-top: 2px;
             text-align: right;
         }
-        
         .message .msg-actions {
             position: absolute;
-            top: 4px;
+            top: 2px;
             right: 4px;
             display: none;
-            gap: 4px;
+            gap: 2px;
         }
-        
-        .message:hover .msg-actions {
-            display: flex;
-        }
-        
+        .message:hover .msg-actions { display: flex; }
         .message .msg-actions button {
             background: rgba(0,0,0,0.5);
             border: none;
             color: #fff;
-            border-radius: 6px;
-            padding: 2px 6px;
+            border-radius: 4px;
+            padding: 2px 5px;
             cursor: pointer;
-            font-size: 10px;
+            font-size: 9px;
         }
-        
-        .message .msg-actions button:hover {
-            background: rgba(0,0,0,0.8);
+        .message .msg-actions button:hover { background: rgba(0,0,0,0.8); }
+        .message .msg-read-status {
+            font-size: 9px;
+            margin-left: 4px;
+            opacity: 0.5;
         }
         
         .chat-input-area {
-            padding: 12px 20px 20px 20px;
+            padding: 8px 12px 12px 12px;
             background: #0d1b2a;
             border-top: 1px solid #2a3a5e;
             display: flex;
-            gap: 12px;
+            gap: 8px;
             align-items: center;
         }
-        
         .chat-input-area input {
             flex: 1;
-            padding: 14px 20px;
+            padding: 10px 14px;
             border-radius: 12px;
             border: 1px solid #2a3a5e;
             background: #16213e;
             color: #f0f4fa;
-            font-size: 15px;
+            font-size: 14px;
             outline: none;
+            min-width: 0;
         }
-        
         .chat-input-area input:focus { border-color: #4f8cf7; }
         .chat-input-area input:disabled { opacity: 0.5; }
-        
         .chat-input-area button {
             background: #4f8cf7;
             border: none;
-            width: 50px;
-            height: 50px;
+            width: 42px;
+            height: 42px;
             border-radius: 12px;
             color: white;
-            font-size: 20px;
+            font-size: 16px;
             cursor: pointer;
             transition: 0.15s;
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
-        
         .chat-input-area button:hover { background: #3a73e0; }
         .chat-input-area button:disabled { opacity: 0.5; cursor: not-allowed; }
         
         .empty-chat {
             color: #667799;
             text-align: center;
-            margin-top: 60px;
-            font-size: 16px;
+            margin-top: 40px;
+            font-size: 14px;
         }
         
-        .typing-indicator {
-            display: flex;
-            gap: 4px;
-            padding: 8px 12px;
-            background: #1a2a4e;
+        /* Уведомление */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #16213e;
+            border: 1px solid #4f8cf7;
             border-radius: 12px;
-            align-self: flex-start;
-            margin: 4px 0;
+            padding: 12px 16px;
+            max-width: 300px;
+            color: #e0e0e0;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            animation: slideIn 0.3s ease;
+            z-index: 999;
+            display: none;
+        }
+        .notification.show { display: block; }
+        .notification .notif-title { font-weight: 600; font-size: 14px; }
+        .notification .notif-body { font-size: 13px; color: #8899bb; }
+        
+        @keyframes slideIn {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
         
-        .typing-indicator span {
-            width: 8px;
-            height: 8px;
-            background: #8899bb;
+        /* Модалка профиля */
+        #profile-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        #profile-modal .modal-content {
+            background: #16213e;
+            border-radius: 20px;
+            padding: 28px;
+            max-width: 380px;
+            width: 100%;
+            border: 1px solid #2a3a5e;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        #profile-modal h3 { color: #fff; margin-bottom: 16px; font-size: 20px; }
+        #profile-modal .form-group {
+            margin-bottom: 14px;
+        }
+        #profile-modal label {
+            display: block;
+            font-size: 12px;
+            color: #8899bb;
+            margin-bottom: 4px;
+        }
+        #profile-modal input, #profile-modal select {
+            width: 100%;
+            padding: 10px 14px;
+            background: #0d1b2a;
+            border: 1px solid #2a3a5e;
+            border-radius: 10px;
+            color: #f0f4fa;
+            font-size: 14px;
+            outline: none;
+        }
+        #profile-modal input:focus { border-color: #4f8cf7; }
+        #profile-modal input:disabled { opacity: 0.5; }
+        #profile-modal .avatar-preview {
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
-            animation: typing 1.4s infinite;
+            background: #2a3a5e;
+            margin: 0 auto 12px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #b8ccf0;
+        }
+        #profile-modal .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        #profile-modal .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        #profile-modal .modal-actions button { flex: 1; }
+        
+        /* Адаптив */
+        @media (max-width: 768px) {
+            body { padding: 0; }
+            #app {
+                height: 100vh;
+                max-height: none;
+                border-radius: 0;
+            }
+            .sidebar {
+                width: 200px;
+                flex-shrink: 0;
+            }
+            .sidebar-header h3 { font-size: 15px; }
+            .sidebar-header .user-badge { font-size: 10px; padding: 2px 6px; }
+            .contact-item { padding: 8px 10px; gap: 8px; }
+            .contact-avatar { width: 32px; height: 32px; font-size: 13px; }
+            .contact-name { font-size: 13px; }
+            .contact-lastmsg { font-size: 11px; }
+            .message { max-width: 90%; font-size: 13px; padding: 6px 10px; }
+            .chat-header .chat-partner { font-size: 14px; }
         }
         
-        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-        
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-            30% { transform: translateY(-8px); opacity: 1; }
+        @media (max-width: 480px) {
+            .sidebar { width: 160px; }
+            .sidebar-header { padding: 10px 8px; }
+            .sidebar-header h3 { font-size: 13px; }
+            .sidebar-header .user-badge { font-size: 9px; padding: 2px 4px; }
+            .contact-item { padding: 6px 8px; gap: 6px; }
+            .contact-avatar { width: 28px; height: 28px; font-size: 11px; }
+            .contact-name { font-size: 11px; }
+            .contact-lastmsg { font-size: 10px; }
+            .chat-tabs button { font-size: 10px; padding: 6px 2px; }
+            .auth-card { padding: 20px 16px; }
         }
         
-        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar { width: 3px; }
         ::-webkit-scrollbar-track { background: #0d1b2a; }
         ::-webkit-scrollbar-thumb { background: #2a3a5e; border-radius: 10px; }
-        
-        @media (max-width: 650px) {
-            .sidebar { width: 200px; }
-        }
     </style>
 </head>
 <body>
     <div id="app">
+        <!-- АВТОРИЗАЦИЯ -->
         <div id="auth-screen">
             <div class="auth-card">
                 <h2>🍔 <span class="burger-icon">Burgergram</span></h2>
                 <p class="sub">Вход или регистрация</p>
                 <div id="auth-form">
                     <label><i class="fas fa-user"></i> Имя пользователя</label>
-                    <input type="text" id="auth-username" placeholder="Введите логин (макс 12 символов)" maxlength="12">
+                    <input type="text" id="auth-username" placeholder="Логин (макс 12 симв.)" maxlength="12">
                     <label><i class="fas fa-lock"></i> Пароль</label>
                     <input type="password" id="auth-password" placeholder="Пароль">
                     <div class="actions">
@@ -554,19 +649,30 @@
             </div>
         </div>
 
+        <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
         <div id="main-screen">
             <div class="messenger-layout">
                 <div class="sidebar">
                     <div class="sidebar-header">
                         <h3><i class="fas fa-hamburger"></i> Burgergram</h3>
-                        <div style="display: flex; align-items: center; gap: 6px;">
+                        <div style="display:flex;align-items:center;gap:4px;">
                             <span class="user-badge" id="profile-btn">
                                 <i class="fas fa-user-circle"></i> <span id="current-username-display"></span>
                             </span>
                             <button class="logout-btn" id="logout-btn"><i class="fas fa-sign-out-alt"></i></button>
                         </div>
                     </div>
-                    <div class="contact-list" id="contact-list"></div>
+                    
+                    <!-- Вкладки -->
+                    <div class="chat-tabs">
+                        <button class="active" data-tab="private"><i class="fas fa-user"></i> Личные</button>
+                        <button data-tab="group"><i class="fas fa-users"></i> Группы</button>
+                        <button data-tab="channel"><i class="fas fa-broadcast"></i> Каналы</button>
+                    </div>
+                    
+                    <div class="contact-list" id="contact-list">
+                        <div style="padding:20px;color:#667799;text-align:center;">Загрузка...</div>
+                    </div>
                 </div>
 
                 <div class="chat-area">
@@ -574,12 +680,13 @@
                         <div class="chat-partner" id="chat-partner-name">Выберите чат</div>
                         <div class="typing-status" id="typing-status"></div>
                         <div class="chat-actions">
-                            <button id="clear-chat-btn" title="Очистить чат"><i class="fas fa-trash"></i></button>
-                            <button id="delete-chat-btn" title="Удалить чат"><i class="fas fa-times-circle"></i></button>
+                            <button id="create-chat-btn" title="Создать чат"><i class="fas fa-plus"></i></button>
+                            <button id="clear-chat-btn" title="Очистить"><i class="fas fa-trash"></i></button>
+                            <button id="delete-chat-btn" title="Удалить"><i class="fas fa-times-circle"></i></button>
                         </div>
                     </div>
                     <div class="messages-container" id="messages-container">
-                        <div class="empty-chat">🍔 Напишите сообщение</div>
+                        <div class="empty-chat">🍔 Выберите чат</div>
                     </div>
                     <div class="chat-input-area">
                         <input type="text" id="message-input" placeholder="Сообщение..." disabled>
@@ -590,53 +697,98 @@
         </div>
     </div>
 
-    <!-- Модальное окно профиля -->
-    <div id="profile-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:1000;justify-content:center;align-items:center;">
-        <div style="background:#16213e;border-radius:24px;padding:40px;max-width:400px;width:90%;border:1px solid #2a3a5e;">
-            <h3 style="color:#fff;margin-bottom:20px;">Настройки профиля</h3>
-            <div style="display:flex;flex-direction:column;gap:16px;">
-                <div style="text-align:center;">
-                    <div id="profile-avatar-preview" style="width:80px;height:80px;border-radius:50%;background:#2a3a5e;margin:0 auto;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:32px;color:#b8ccf0;">
-                        <i class="fas fa-user"></i>
-                    </div>
-                </div>
-                <label style="color:#8899bb;font-size:13px;">URL аватара</label>
-                <input type="text" id="profile-avatar-input" placeholder="https://example.com/avatar.jpg" style="width:100%;padding:12px;background:#0d1b2a;border:1px solid #2a3a5e;border-radius:12px;color:#f0f4fa;outline:none;">
-                <label style="color:#8899bb;font-size:13px;">Отображаемое имя</label>
-                <input type="text" id="profile-display-name" placeholder="Отображаемое имя" style="width:100%;padding:12px;background:#0d1b2a;border:1px solid #2a3a5e;border-radius:12px;color:#f0f4fa;outline:none;">
-                <label style="color:#8899bb;font-size:13px;">Имя пользователя (нельзя изменить)</label>
-                <input type="text" id="profile-username" disabled style="width:100%;padding:12px;background:#0d1b2a;border:1px solid #2a3a5e;border-radius:12px;color:#667799;outline:none;opacity:0.7;">
-                <div style="display:flex;gap:12px;margin-top:12px;">
-                    <button id="profile-save-btn" class="btn-primary" style="flex:1;">Сохранить</button>
-                    <button id="profile-close-btn" class="btn-outline" style="flex:1;">Закрыть</button>
+    <!-- УВЕДОМЛЕНИЕ -->
+    <div class="notification" id="notification">
+        <div class="notif-title" id="notif-title">Новое сообщение</div>
+        <div class="notif-body" id="notif-body"></div>
+    </div>
+
+    <!-- МОДАЛКА ПРОФИЛЯ -->
+    <div id="profile-modal">
+        <div class="modal-content">
+            <h3>⚙️ Настройки профиля</h3>
+            <div style="text-align:center;">
+                <div class="avatar-preview" id="profile-avatar-preview">
+                    <i class="fas fa-user"></i>
                 </div>
             </div>
+            <div class="form-group">
+                <label>URL аватара</label>
+                <input type="text" id="profile-avatar-input" placeholder="https://example.com/avatar.jpg">
+            </div>
+            <div class="form-group">
+                <label>Отображаемое имя</label>
+                <input type="text" id="profile-display-name" placeholder="Отображаемое имя">
+            </div>
+            <div class="form-group">
+                <label>Имя пользователя (нельзя изменить)</label>
+                <input type="text" id="profile-username" disabled>
+            </div>
+            <div class="form-group">
+                <label>Статус</label>
+                <select id="profile-status">
+                    <option value="online">🟢 В сети</option>
+                    <option value="away">🟡 Отошел</option>
+                    <option value="offline">⚫ Не в сети</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-primary" id="profile-save-btn">Сохранить</button>
+                <button class="btn-outline" id="profile-close-btn">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛКА СОЗДАНИЯ ЧАТА -->
+    <div id="create-chat-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:1000;justify-content:center;align-items:center;padding:20px;">
+        <div style="background:#16213e;border-radius:20px;padding:28px;max-width:380px;width:100%;border:1px solid #2a3a5e;">
+            <h3 style="color:#fff;margin-bottom:16px;">📝 Создать чат</h3>
+            <div class="form-group">
+                <label>Тип</label>
+                <select id="create-chat-type">
+                    <option value="private">Личный</option>
+                    <option value="group">Группа</option>
+                    <option value="channel">Канал</option>
+                </select>
+            </div>
+            <div class="form-group" id="create-chat-name-group">
+                <label>Название</label>
+                <input type="text" id="create-chat-name" placeholder="Название чата">
+            </div>
+            <div class="form-group" id="create-chat-user-group">
+                <label>Пользователь (username)</label>
+                <input type="text" id="create-chat-user" placeholder="Имя пользователя">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-primary" id="create-chat-btn-action">Создать</button>
+                <button class="btn-outline" id="create-chat-close-btn">Отмена</button>
+            </div>
+            <div id="create-chat-error" style="color:#f79cb0;font-size:12px;margin-top:8px;display:none;"></div>
         </div>
     </div>
 
     <script>
         // ============================================
-        // SUPABASE КОНФИГ
+        // SUPABASE
         // ============================================
         const SUPABASE_URL = 'https://qdmdkezsmxxihepkcqwc.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_hv8rO0WGe0lCujYEiPT3_A_duaiQ1rP';
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // ============================================
-        // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+        // СОСТОЯНИЕ
         // ============================================
         let currentUser = null;
-        let currentChatUserId = null;
+        let currentChatId = null;
+        let currentTab = 'private';
+        let allChats = [];
         let allUsers = [];
         let messagesSubscription = null;
-        let verifiedInterval = null;
-        let onlineInterval = null;
         let typingTimeout = null;
         let isTyping = false;
+        let notificationTimeout = null;
 
-        // ============================================
-        // DOM ЭЛЕМЕНТЫ
-        // ============================================
+        // DOM
         const authScreen = document.getElementById('auth-screen');
         const mainScreen = document.getElementById('main-screen');
         const authMessage = document.getElementById('auth-message');
@@ -654,34 +806,30 @@
         const typingStatus = document.getElementById('typing-status');
         const clearChatBtn = document.getElementById('clear-chat-btn');
         const deleteChatBtn = document.getElementById('delete-chat-btn');
+        const createChatBtn = document.getElementById('create-chat-btn');
+        const notification = document.getElementById('notification');
+        const notifTitle = document.getElementById('notif-title');
+        const notifBody = document.getElementById('notif-body');
+
+        // Профиль
         const profileBtn = document.getElementById('profile-btn');
         const profileModal = document.getElementById('profile-modal');
         const profileAvatarInput = document.getElementById('profile-avatar-input');
         const profileDisplayName = document.getElementById('profile-display-name');
         const profileUsername = document.getElementById('profile-username');
         const profileAvatarPreview = document.getElementById('profile-avatar-preview');
+        const profileStatus = document.getElementById('profile-status');
         const profileSaveBtn = document.getElementById('profile-save-btn');
         const profileCloseBtn = document.getElementById('profile-close-btn');
 
-        // ============================================
-        // СОХРАНЕНИЕ СОСТОЯНИЯ В LOCALSTORAGE
-        // ============================================
-        function saveSession(user) {
-            if (user) {
-                localStorage.setItem('burgergram_session', JSON.stringify(user));
-            } else {
-                localStorage.removeItem('burgergram_session');
-            }
-        }
-
-        function loadSession() {
-            try {
-                const data = localStorage.getItem('burgergram_session');
-                return data ? JSON.parse(data) : null;
-            } catch {
-                return null;
-            }
-        }
+        // Создание чата
+        const createChatModal = document.getElementById('create-chat-modal');
+        const createChatType = document.getElementById('create-chat-type');
+        const createChatName = document.getElementById('create-chat-name');
+        const createChatUser = document.getElementById('create-chat-user');
+        const createChatBtnAction = document.getElementById('create-chat-btn-action');
+        const createChatCloseBtn = document.getElementById('create-chat-close-btn');
+        const createChatError = document.getElementById('create-chat-error');
 
         // ============================================
         // ПОМОЩНИКИ
@@ -691,178 +839,93 @@
             authMessage.className = type === 'error' ? 'auth-error' : 'auth-success';
             authMessage.textContent = msg;
         }
+        function hideMessage() { authMessage.style.display = 'none'; }
 
-        function hideMessage() {
-            authMessage.style.display = 'none';
+        function showNotification(title, body) {
+            notifTitle.textContent = title;
+            notifBody.textContent = body;
+            notification.classList.add('show');
+            clearTimeout(notificationTimeout);
+            notificationTimeout = setTimeout(() => notification.classList.remove('show'), 4000);
+        }
+
+        function saveSession(user) {
+            if (user) localStorage.setItem('burgergram_session', JSON.stringify(user));
+            else localStorage.removeItem('burgergram_session');
+        }
+        function loadSession() {
+            try { return JSON.parse(localStorage.getItem('burgergram_session')); }
+            catch { return null; }
         }
 
         // ============================================
-        // РЕГИСТРАЦИЯ
+        // АВТОРИЗАЦИЯ
         // ============================================
         async function registerUser() {
             const username = authUsername.value.trim();
             const password = authPassword.value.trim();
-
-            if (!username || !password) {
-                showMessage('❌ Заполните все поля');
-                return;
-            }
-
-            if (username.length < 3) {
-                showMessage('❌ Имя пользователя минимум 3 символа');
-                return;
-            }
-
-            if (username.length > 12) {
-                showMessage('❌ Имя пользователя максимум 12 символов');
-                return;
-            }
-
-            if (password.length < 4) {
-                showMessage('❌ Пароль минимум 4 символа');
-                return;
-            }
-
+            if (!username || !password) return showMessage('❌ Заполните поля');
+            if (username.length < 3) return showMessage('❌ Минимум 3 символа');
+            if (username.length > 12) return showMessage('❌ Максимум 12 символов');
+            if (password.length < 4) return showMessage('❌ Пароль минимум 4 символа');
             hideMessage();
 
             try {
-                const { data: existing } = await supabaseClient
-                    .from('users')
-                    .select('id')
-                    .eq('username', username)
-                    .maybeSingle();
+                const { data: existing } = await supabase.from('users').select('id').eq('username', username).maybeSingle();
+                if (existing) return showMessage('❌ Пользователь уже существует');
 
-                if (existing) {
-                    showMessage('❌ Пользователь уже существует');
-                    return;
-                }
-
-                const { data, error } = await supabaseClient
-                    .from('users')
-                    .insert([{ 
-                        username, 
-                        password,
-                        display_name: username,
-                        verified: false,
-                        is_online: true,
-                        last_seen: new Date().toISOString()
-                    }])
-                    .select()
-                    .single();
-
-                if (error) {
-                    showMessage('❌ Ошибка регистрации: ' + error.message);
-                    return;
-                }
+                const { error } = await supabase.from('users').insert([{ 
+                    username, password, display_name: username,
+                    verified: false, is_online: true, last_seen: new Date().toISOString()
+                }]);
+                if (error) throw error;
 
                 showMessage('✅ Регистрация успешна!', 'success');
                 setTimeout(() => loginUser(username, password), 1000);
-
-            } catch (error) {
-                showMessage('❌ Ошибка: ' + error.message);
-            }
+            } catch (e) { showMessage('❌ ' + e.message); }
         }
 
-        // ============================================
-        // ВХОД
-        // ============================================
         async function loginUser(username, password) {
-            if (!username || !password) {
-                showMessage('❌ Введите логин и пароль');
-                return;
-            }
-
+            if (!username || !password) return showMessage('❌ Введите данные');
             hideMessage();
 
             try {
-                const { data, error } = await supabaseClient
+                const { data, error } = await supabase
                     .from('users')
                     .select('*')
                     .eq('username', username)
                     .eq('password', password)
                     .maybeSingle();
-
-                if (error || !data) {
-                    showMessage('❌ Неверный логин или пароль');
-                    return;
-                }
+                if (error || !data) return showMessage('❌ Неверный логин или пароль');
 
                 currentUser = data;
                 saveSession(data);
-                await updateOnlineStatus(true);
+                await supabase.from('users').update({ is_online: true, last_seen: new Date().toISOString() }).eq('id', data.id);
                 currentUsernameDisplay.textContent = data.display_name || data.username;
                 enterMainScreen();
-
-            } catch (error) {
-                showMessage('❌ Ошибка: ' + error.message);
-            }
+            } catch (e) { showMessage('❌ ' + e.message); }
         }
 
         // ============================================
-        // ONLINE СТАТУС
-        // ============================================
-        async function updateOnlineStatus(isOnline) {
-            if (!currentUser) return;
-            try {
-                await supabaseClient
-                    .from('users')
-                    .update({ 
-                        is_online: isOnline,
-                        last_seen: new Date().toISOString()
-                    })
-                    .eq('id', currentUser.id);
-            } catch (error) {
-                console.error('Ошибка обновления статуса:', error);
-            }
-        }
-
-        // ============================================
-        // ВХОД В ОСНОВНОЙ ИНТЕРФЕЙС
+        // ОСНОВНАЯ ЛОГИКА
         // ============================================
         function enterMainScreen() {
             authScreen.style.display = 'none';
             mainScreen.style.display = 'flex';
-            loadContacts();
+            loadChats();
             subscribeToMessages();
-            startVerifiedMonitoring();
-            startOnlineMonitoring();
             messageInput.disabled = false;
             sendBtn.disabled = false;
-            
-            // Тайпинг индикатор
-            messageInput.addEventListener('input', () => {
-                if (!isTyping && currentChatUserId) {
-                    isTyping = true;
-                    // Отправляем статус печатает
-                    typingStatus.textContent = 'печатает...';
-                    clearTimeout(typingTimeout);
-                    typingTimeout = setTimeout(() => {
-                        isTyping = false;
-                        typingStatus.textContent = '';
-                    }, 2000);
-                }
-            });
+            setupTyping();
+            updateOnlineStatus();
         }
 
-        // ============================================
-        // ВЫХОД
-        // ============================================
         async function logout() {
-            await updateOnlineStatus(false);
-            if (messagesSubscription) {
-                messagesSubscription.unsubscribe();
-                messagesSubscription = null;
+            if (currentUser) {
+                await supabase.from('users').update({ is_online: false, last_seen: new Date().toISOString() }).eq('id', currentUser.id);
             }
-            if (verifiedInterval) {
-                clearInterval(verifiedInterval);
-                verifiedInterval = null;
-            }
-            if (onlineInterval) {
-                clearInterval(onlineInterval);
-                onlineInterval = null;
-            }
-            currentUser = null;
-            currentChatUserId = null;
+            if (messagesSubscription) { messagesSubscription.unsubscribe(); messagesSubscription = null; }
+            currentUser = null; currentChatId = null;
             saveSession(null);
             authScreen.style.display = 'flex';
             mainScreen.style.display = 'none';
@@ -874,85 +937,160 @@
             hideMessage();
         }
 
-        // ============================================
-        // МОНИТОРИНГ ONLINE
-        // ============================================
-        function startOnlineMonitoring() {
-            if (onlineInterval) clearInterval(onlineInterval);
-            onlineInterval = setInterval(async () => {
-                if (!currentUser) return;
-                await updateOnlineStatus(true);
+        async function updateOnlineStatus() {
+            if (!currentUser) return;
+            setInterval(async () => {
+                await supabase.from('users').update({ is_online: true, last_seen: new Date().toISOString() }).eq('id', currentUser.id);
             }, 30000);
         }
 
         // ============================================
-        // ЗАГРУЗКА КОНТАКТОВ
+        // ЗАГРУЗКА ЧАТОВ
         // ============================================
-        async function loadContacts() {
+        async function loadChats() {
             if (!currentUser) return;
-
             try {
-                const { data, error } = await supabaseClient
-                    .from('users')
-                    .select('*')
-                    .neq('id', currentUser.id);
+                // Загружаем все чаты где пользователь участник
+                const { data: members, error: mError } = await supabase
+                    .from('chat_members')
+                    .select('chat_id, role, last_read')
+                    .eq('user_id', currentUser.id);
+                if (mError) throw mError;
 
-                if (error) throw error;
-                allUsers = data || [];
-                renderContactList();
+                const chatIds = members.map(m => m.chat_id);
+                if (chatIds.length === 0) {
+                    allChats = [];
+                    renderChatList();
+                    return;
+                }
 
-            } catch (error) {
-                console.error('Ошибка загрузки контактов:', error);
-            }
+                const { data: chats, error: cError } = await supabase
+                    .from('chats')
+                    .select('*, chat_members!inner(user_id, role), users!created_by(username, display_name)')
+                    .in('id', chatIds);
+                if (cError) throw cError;
+
+                // Загружаем пользователей
+                const { data: users } = await supabase.from('users').select('id, username, display_name, avatar_url, verified, is_online, last_seen');
+                allUsers = users || [];
+
+                // Добавляем последнее сообщение и непрочитанные
+                for (let chat of chats) {
+                    const { data: lastMsg } = await supabase
+                        .from('messages')
+                        .select('*')
+                        .eq('chat_id', chat.id)
+                        .order('created_at', { ascending: false })
+                        .limit(1);
+                    chat.last_message = lastMsg?.[0] || null;
+
+                    // Считаем непрочитанные
+                    const member = members.find(m => m.chat_id === chat.id);
+                    if (member) {
+                        const { count } = await supabase
+                            .from('messages')
+                            .select('*', { count: 'exact', head: true })
+                            .eq('chat_id', chat.id)
+                            .gt('created_at', member.last_read || new Date(0))
+                            .neq('sender_id', currentUser.id);
+                        chat.unread_count = count || 0;
+                    }
+                }
+
+                allChats = chats;
+                renderChatList();
+
+            } catch (e) { console.error('Ошибка загрузки чатов:', e); }
         }
 
-        function renderContactList() {
+        function renderChatList() {
+            const filtered = allChats.filter(c => c.type === currentTab);
             contactList.innerHTML = '';
-            
-            if (allUsers.length === 0) {
-                contactList.innerHTML = '<div style="padding:20px;color:#667799;text-align:center;">Нет других пользователей</div>';
+
+            if (filtered.length === 0) {
+                contactList.innerHTML = `<div style="padding:20px;color:#667799;text-align:center;font-size:13px;">
+                    Нет ${currentTab === 'private' ? 'личных' : currentTab === 'group' ? 'групп' : 'каналов'}<br>
+                    <span style="font-size:11px;">Нажмите + для создания</span>
+                </div>`;
                 return;
             }
 
-            allUsers.forEach(user => {
+            filtered.forEach(chat => {
                 const div = document.createElement('div');
                 div.className = 'contact-item';
-                if (currentChatUserId === user.id) div.classList.add('active');
+                if (currentChatId === chat.id) div.classList.add('active');
+
+                // Получаем собеседника для приватного чата
+                let partner = null;
+                if (chat.type === 'private') {
+                    const member = chat.chat_members.find(m => m.user_id !== currentUser.id);
+                    if (member) partner = allUsers.find(u => u.id === member.user_id);
+                }
 
                 const avatar = document.createElement('div');
                 avatar.className = 'contact-avatar';
-                if (user.avatar_url) {
-                    avatar.innerHTML = `<img src="${user.avatar_url}" alt="${user.username}">`;
+                const avatarUrl = chat.type === 'private' ? partner?.avatar_url : chat.avatar_url;
+                const name = chat.type === 'private' ? (partner?.display_name || partner?.username || 'Unknown') : (chat.name || 'Чат');
+                if (avatarUrl) {
+                    avatar.innerHTML = `<img src="${avatarUrl}" alt="${name}">`;
                 } else {
-                    avatar.textContent = (user.display_name || user.username).charAt(0).toUpperCase();
+                    avatar.textContent = name.charAt(0).toUpperCase();
                 }
-                
-                const dot = document.createElement('div');
-                dot.className = `online-dot ${user.is_online ? 'online' : 'offline'}`;
-                avatar.appendChild(dot);
+
+                if (chat.type === 'private' && partner) {
+                    const dot = document.createElement('div');
+                    dot.className = `online-dot ${partner.is_online ? 'online' : 'offline'}`;
+                    avatar.appendChild(dot);
+                }
 
                 const info = document.createElement('div');
                 info.className = 'contact-info';
 
-                const name = document.createElement('div');
-                name.className = 'contact-name';
-                name.textContent = user.display_name || user.username;
-                if (user.verified) {
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'contact-name';
+                nameDiv.textContent = name;
+                if (chat.type !== 'private') {
+                    const badge = document.createElement('span');
+                    badge.className = 'chat-type-badge';
+                    badge.textContent = chat.type === 'group' ? 'Группа' : 'Канал';
+                    nameDiv.appendChild(badge);
+                }
+                if (partner?.verified) {
                     const icon = document.createElement('i');
                     icon.className = 'fas fa-check-circle verified-icon';
-                    name.appendChild(icon);
+                    nameDiv.appendChild(icon);
                 }
 
-                const last = document.createElement('div');
-                last.className = 'contact-lastmsg';
-                last.textContent = user.is_online ? 'В сети' : 'Был(а) ' + (user.last_seen ? new Date(user.last_seen).toLocaleString() : 'давно');
+                const lastMsg = document.createElement('div');
+                lastMsg.className = 'contact-lastmsg';
+                if (chat.last_message) {
+                    const sender = chat.last_message.sender_id === currentUser.id ? 'Вы: ' : '';
+                    lastMsg.textContent = sender + chat.last_message.content;
+                } else {
+                    lastMsg.textContent = 'Нет сообщений';
+                }
 
-                info.appendChild(name);
-                info.appendChild(last);
+                const time = document.createElement('div');
+                time.className = 'contact-time';
+                if (chat.last_message?.created_at) {
+                    const d = new Date(chat.last_message.created_at);
+                    time.textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                }
+
+                info.appendChild(nameDiv);
+                info.appendChild(lastMsg);
                 div.appendChild(avatar);
                 div.appendChild(info);
+                div.appendChild(time);
 
-                div.addEventListener('click', () => openChat(user.id));
+                if (chat.unread_count > 0) {
+                    const badge = document.createElement('span');
+                    badge.className = 'unread-badge';
+                    badge.textContent = chat.unread_count > 99 ? '99+' : chat.unread_count;
+                    div.appendChild(badge);
+                }
+
+                div.addEventListener('click', () => openChat(chat.id));
                 contactList.appendChild(div);
             });
         }
@@ -960,31 +1098,35 @@
         // ============================================
         // ОТКРЫТЬ ЧАТ
         // ============================================
-        async function openChat(userId) {
+        async function openChat(chatId) {
             if (!currentUser) return;
-            currentChatUserId = userId;
-            
-            document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
-            const items = document.querySelectorAll('.contact-item');
-            items.forEach(item => {
-                const name = item.querySelector('.contact-name');
-                if (name && name.textContent.trim() === (allUsers.find(u => u.id === userId)?.display_name || allUsers.find(u => u.id === userId)?.username)) {
-                    item.classList.add('active');
-                }
-            });
+            currentChatId = chatId;
+            const chat = allChats.find(c => c.id === chatId);
+            if (!chat) return;
 
-            const partner = allUsers.find(u => u.id === userId);
-            if (partner) {
-                chatPartnerName.innerHTML = `
-                    ${partner.display_name || partner.username}
-                    ${partner.verified ? '<i class="fas fa-check-circle verified-icon" style="color:#4ade80;font-size:14px;"></i>' : ''}
-                    <span style="font-size:12px;color:#8899bb;margin-left:8px;">
-                        ${partner.is_online ? '🟢' : '⚫'}
-                    </span>
-                `;
+            let partner = null;
+            if (chat.type === 'private') {
+                const member = chat.chat_members.find(m => m.user_id !== currentUser.id);
+                if (member) partner = allUsers.find(u => u.id === member.user_id);
             }
-            
-            await loadMessages(userId);
+
+            const name = chat.type === 'private' ? (partner?.display_name || partner?.username || 'Чат') : (chat.name || 'Чат');
+            chatPartnerName.innerHTML = `
+                ${name}
+                ${partner?.verified ? '<i class="fas fa-check-circle verified-icon"></i>' : ''}
+                <span style="font-size:11px;color:#8899bb;margin-left:6px;">
+                    ${partner?.is_online ? '🟢' : '⚫'}
+                </span>
+            `;
+
+            // Отмечаем прочитанными
+            await supabase
+                .from('chat_members')
+                .update({ last_read: new Date().toISOString() })
+                .eq('chat_id', chatId)
+                .eq('user_id', currentUser.id);
+
+            await loadMessages(chatId);
             messageInput.disabled = false;
             sendBtn.disabled = false;
             messageInput.focus();
@@ -993,14 +1135,14 @@
         // ============================================
         // ЗАГРУЗКА СООБЩЕНИЙ
         // ============================================
-        async function loadMessages(otherUserId) {
-            if (!currentUser || !otherUserId) return;
-
+        async function loadMessages(chatId) {
+            if (!chatId) return;
             try {
-                const { data, error } = await supabaseClient
+                const { data, error } = await supabase
                     .from('messages')
                     .select('*')
-                    .or(`and(sender_id.eq.${currentUser.id}, receiver_id.eq.${otherUserId}),and(sender_id.eq.${otherUserId}, receiver_id.eq.${currentUser.id})`)
+                    .eq('chat_id', chatId)
+                    .eq('is_deleted', false)
                     .order('created_at', { ascending: true })
                     .limit(50);
 
@@ -1013,7 +1155,6 @@
                 }
 
                 data.forEach(msg => {
-                    if (msg.is_deleted) return;
                     const isOwn = msg.sender_id === currentUser.id;
                     const sender = allUsers.find(u => u.id === msg.sender_id);
                     const senderName = isOwn ? 'Вы' : (sender?.display_name || sender?.username || 'Неизвестный');
@@ -1022,44 +1163,37 @@
 
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-            } catch (error) {
-                console.error('Ошибка загрузки сообщений:', error);
-            }
+            } catch (e) { console.error('Ошибка загрузки:', e); }
         }
 
         function appendMessage(text, isOwn, senderName, timestamp, msgId) {
             const div = document.createElement('div');
             div.className = `message ${isOwn ? 'own' : ''}`;
             div.dataset.msgId = msgId;
-            
+
             const senderSpan = document.createElement('div');
             senderSpan.className = 'msg-sender';
             senderSpan.textContent = senderName;
-            
+
             const textSpan = document.createElement('div');
             textSpan.textContent = text;
-            
+
             const timeSpan = document.createElement('div');
             timeSpan.className = 'msg-time';
             if (timestamp) {
                 const d = new Date(timestamp);
                 timeSpan.textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             }
-            
-            // Действия над сообщением
+
             const actions = document.createElement('div');
             actions.className = 'msg-actions';
             if (isOwn) {
-                const deleteBtn = document.createElement('button');
-                deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
-                deleteBtn.title = 'Удалить';
-                deleteBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    deleteMessage(msgId);
-                };
-                actions.appendChild(deleteBtn);
+                const delBtn = document.createElement('button');
+                delBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                delBtn.onclick = (e) => { e.stopPropagation(); deleteMessage(msgId); };
+                actions.appendChild(delBtn);
             }
-            
+
             div.appendChild(senderSpan);
             div.appendChild(textSpan);
             div.appendChild(timeSpan);
@@ -1069,92 +1203,22 @@
         }
 
         // ============================================
-        // УДАЛЕНИЕ СООБЩЕНИЯ
-        // ============================================
-        async function deleteMessage(msgId) {
-            if (!msgId || !currentUser) return;
-            if (!confirm('Удалить сообщение?')) return;
-
-            try {
-                const { error } = await supabaseClient
-                    .from('messages')
-                    .update({ is_deleted: true })
-                    .eq('id', msgId)
-                    .eq('sender_id', currentUser.id);
-
-                if (error) throw error;
-
-                // Удаляем из DOM
-                const msgEl = document.querySelector(`[data-msg-id="${msgId}"]`);
-                if (msgEl) msgEl.remove();
-
-            } catch (error) {
-                console.error('Ошибка удаления:', error);
-            }
-        }
-
-        // ============================================
-        // ОЧИСТКА ЧАТА
-        // ============================================
-        async function clearChat() {
-            if (!currentUser || !currentChatUserId) return;
-            if (!confirm('Очистить всю историю чата?')) return;
-
-            try {
-                const { error } = await supabaseClient
-                    .from('messages')
-                    .update({ is_deleted: true })
-                    .or(`and(sender_id.eq.${currentUser.id}, receiver_id.eq.${currentChatUserId}),and(sender_id.eq.${currentChatUserId}, receiver_id.eq.${currentUser.id})`);
-
-                if (error) throw error;
-                await loadMessages(currentChatUserId);
-
-            } catch (error) {
-                console.error('Ошибка очистки:', error);
-            }
-        }
-
-        // ============================================
-        // УДАЛЕНИЕ ЧАТА
-        // ============================================
-        async function deleteChat() {
-            if (!currentUser || !currentChatUserId) return;
-            if (!confirm('Удалить весь чат?')) return;
-
-            try {
-                const { error } = await supabaseClient
-                    .from('messages')
-                    .delete()
-                    .or(`and(sender_id.eq.${currentUser.id}, receiver_id.eq.${currentChatUserId}),and(sender_id.eq.${currentChatUserId}, receiver_id.eq.${currentUser.id})`);
-
-                if (error) throw error;
-                currentChatUserId = null;
-                messagesContainer.innerHTML = '<div class="empty-chat">🍔 Чат удален</div>';
-                chatPartnerName.textContent = 'Выберите чат';
-                document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
-
-            } catch (error) {
-                console.error('Ошибка удаления чата:', error);
-            }
-        }
-
-        // ============================================
         // ОТПРАВКА СООБЩЕНИЯ
         // ============================================
         async function sendMessage() {
             const text = messageInput.value.trim();
-            if (!text || !currentUser || !currentChatUserId) return;
+            if (!text || !currentUser || !currentChatId) return;
 
             messageInput.value = '';
             messageInput.disabled = true;
             sendBtn.disabled = true;
 
             try {
-                const { data, error } = await supabaseClient
+                const { data, error } = await supabase
                     .from('messages')
                     .insert([{
+                        chat_id: currentChatId,
                         sender_id: currentUser.id,
-                        receiver_id: currentChatUserId,
                         content: text,
                         created_at: new Date().toISOString()
                     }])
@@ -1167,8 +1231,8 @@
                 sendBtn.disabled = false;
                 messageInput.focus();
 
-            } catch (error) {
-                console.error('Ошибка отправки:', error);
+            } catch (e) {
+                console.error('Ошибка:', e);
                 messageInput.value = text;
                 messageInput.disabled = false;
                 sendBtn.disabled = false;
@@ -1176,92 +1240,208 @@
         }
 
         // ============================================
+        // УДАЛЕНИЕ СООБЩЕНИЯ
+        // ============================================
+        async function deleteMessage(msgId) {
+            if (!msgId || !currentUser) return;
+            if (!confirm('Удалить сообщение?')) return;
+
+            try {
+                await supabase.from('messages').update({ is_deleted: true }).eq('id', msgId).eq('sender_id', currentUser.id);
+                const el = document.querySelector(`[data-msg-id="${msgId}"]`);
+                if (el) el.remove();
+            } catch (e) { console.error('Ошибка:', e); }
+        }
+
+        // ============================================
+        // ОЧИСТКА/УДАЛЕНИЕ ЧАТА
+        // ============================================
+        async function clearChat() {
+            if (!currentChatId) return;
+            if (!confirm('Очистить историю чата?')) return;
+            try {
+                await supabase.from('messages').update({ is_deleted: true }).eq('chat_id', currentChatId);
+                await loadMessages(currentChatId);
+            } catch (e) { console.error('Ошибка:', e); }
+        }
+
+        async function deleteChat() {
+            if (!currentChatId) return;
+            if (!confirm('Удалить чат навсегда?')) return;
+            try {
+                // Удаляем сообщения
+                await supabase.from('messages').delete().eq('chat_id', currentChatId);
+                // Удаляем участников
+                await supabase.from('chat_members').delete().eq('chat_id', currentChatId);
+                // Удаляем чат
+                await supabase.from('chats').delete().eq('id', currentChatId);
+
+                currentChatId = null;
+                messagesContainer.innerHTML = '<div class="empty-chat">🍔 Чат удален</div>';
+                chatPartnerName.textContent = 'Выберите чат';
+                document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
+                await loadChats();
+            } catch (e) { console.error('Ошибка:', e); }
+        }
+
+        // ============================================
+        // ТАЙПИНГ
+        // ============================================
+        function setupTyping() {
+            messageInput.addEventListener('input', () => {
+                if (!isTyping && currentChatId) {
+                    isTyping = true;
+                    typingStatus.textContent = '✏️ печатает...';
+                    clearTimeout(typingTimeout);
+                    typingTimeout = setTimeout(() => {
+                        isTyping = false;
+                        typingStatus.textContent = '';
+                    }, 2000);
+                }
+            });
+        }
+
+        // ============================================
+        // СОЗДАНИЕ ЧАТА
+        // ============================================
+        function openCreateChat() {
+            createChatModal.style.display = 'flex';
+            createChatName.value = '';
+            createChatUser.value = '';
+            createChatError.style.display = 'none';
+        }
+
+        createChatType.addEventListener('change', () => {
+            const type = createChatType.value;
+            document.getElementById('create-chat-name-group').style.display = type === 'private' ? 'none' : 'block';
+            document.getElementById('create-chat-user-group').style.display = type === 'private' ? 'block' : 'block';
+        });
+
+        async function createChat() {
+            const type = createChatType.value;
+            const name = createChatName.value.trim();
+            const username = createChatUser.value.trim();
+
+            if (type !== 'private' && !name) {
+                createChatError.textContent = '❌ Введите название';
+                createChatError.style.display = 'block';
+                return;
+            }
+
+            if (type === 'private' && !username) {
+                createChatError.textContent = '❌ Введите имя пользователя';
+                createChatError.style.display = 'block';
+                return;
+            }
+
+            try {
+                let chatId;
+
+                if (type === 'private') {
+                    // Находим пользователя
+                    const { data: user } = await supabase
+                        .from('users')
+                        .select('id')
+                        .eq('username', username)
+                        .maybeSingle();
+
+                    if (!user) {
+                        createChatError.textContent = '❌ Пользователь не найден';
+                        createChatError.style.display = 'block';
+                        return;
+                    }
+
+                    // Используем функцию создания приватного чата
+                    const { data, error } = await supabase.rpc('create_private_chat', {
+                        user1_id: currentUser.id,
+                        user2_id: user.id
+                    });
+
+                    if (error) throw error;
+                    chatId = data;
+
+                } else {
+                    // Создаем группу/канал
+                    const { data, error } = await supabase
+                        .from('chats')
+                        .insert([{ name, type, created_by: currentUser.id }])
+                        .select()
+                        .single();
+
+                    if (error) throw error;
+                    chatId = data.id;
+
+                    // Добавляем создателя как участника
+                    await supabase.from('chat_members').insert([
+                        { chat_id: chatId, user_id: currentUser.id, role: 'admin' }
+                    ]);
+
+                    // Если указан пользователь, добавляем его
+                    if (username) {
+                        const { data: user } = await supabase
+                            .from('users')
+                            .select('id')
+                            .eq('username', username)
+                            .maybeSingle();
+                        if (user) {
+                            await supabase.from('chat_members').insert([
+                                { chat_id: chatId, user_id: user.id, role: 'member' }
+                            ]);
+                        }
+                    }
+                }
+
+                createChatModal.style.display = 'none';
+                await loadChats();
+                setTimeout(() => openChat(chatId), 500);
+
+            } catch (e) {
+                createChatError.textContent = '❌ ' + e.message;
+                createChatError.style.display = 'block';
+            }
+        }
+
+        // ============================================
         // ПОДПИСКА НА СООБЩЕНИЯ
         // ============================================
         function subscribeToMessages() {
-            if (messagesSubscription) {
-                messagesSubscription.unsubscribe();
-            }
+            if (messagesSubscription) messagesSubscription.unsubscribe();
 
-            messagesSubscription = supabaseClient
+            messagesSubscription = supabase
                 .channel('messages-channel')
                 .on('postgres_changes', {
                     event: 'INSERT',
                     schema: 'public',
                     table: 'messages'
-                }, (payload) => {
-                    const newMsg = payload.new;
-                    if (newMsg.is_deleted) return;
-                    
-                    if (currentUser && currentChatUserId) {
-                        const isRelevant = 
-                            (newMsg.sender_id === currentChatUserId && newMsg.receiver_id === currentUser.id) ||
-                            (newMsg.sender_id === currentUser.id && newMsg.receiver_id === currentChatUserId);
-                        
-                        if (isRelevant && newMsg.sender_id !== currentUser.id) {
-                            const sender = allUsers.find(u => u.id === newMsg.sender_id);
-                            const senderName = sender?.display_name || sender?.username || 'Собеседник';
-                            appendMessage(newMsg.content, false, senderName, newMsg.created_at, newMsg.id);
+                }, async (payload) => {
+                    const msg = payload.new;
+                    if (msg.is_deleted) return;
+
+                    // Проверяем, в текущем ли чате
+                    if (currentChatId === msg.chat_id && msg.sender_id !== currentUser.id) {
+                        const sender = allUsers.find(u => u.id === msg.sender_id);
+                        const senderName = sender?.display_name || sender?.username || 'Собеседник';
+                        appendMessage(msg.content, false, senderName, msg.created_at, msg.id);
+                    }
+
+                    // Уведомление если чат не открыт
+                    if (msg.sender_id !== currentUser.id) {
+                        const chat = allChats.find(c => c.id === msg.chat_id);
+                        if (chat) {
+                            let name = chat.name;
+                            if (chat.type === 'private') {
+                                const member = chat.chat_members.find(m => m.user_id !== currentUser.id);
+                                const partner = allUsers.find(u => u.id === member?.user_id);
+                                name = partner?.display_name || partner?.username || 'Чат';
+                            }
+                            showNotification(`📩 ${name}`, msg.content);
                         }
                     }
+
+                    // Обновляем список чатов
+                    await loadChats();
                 })
                 .subscribe();
-        }
-
-        // ============================================
-        // МОНИТОРИНГ VERIFIED
-        // ============================================
-        function startVerifiedMonitoring() {
-            if (verifiedInterval) clearInterval(verifiedInterval);
-            verifiedInterval = setInterval(async () => {
-                if (!currentUser) return;
-                try {
-                    const { data } = await supabaseClient
-                        .from('users')
-                        .select('id, username, display_name, avatar_url, verified, is_online, last_seen')
-                        .neq('id', currentUser.id);
-
-                    if (data) {
-                        allUsers = data;
-                        updateContactStatuses();
-                    }
-                } catch (error) {
-                    console.error('Ошибка обновления:', error);
-                }
-            }, 3000);
-        }
-
-        function updateContactStatuses() {
-            document.querySelectorAll('.contact-item').forEach(item => {
-                const nameEl = item.querySelector('.contact-name');
-                if (!nameEl) return;
-                
-                const username = nameEl.textContent.trim();
-                const user = allUsers.find(u => (u.display_name || u.username) === username);
-                if (user) {
-                    // Обновляем аватар
-                    const avatar = item.querySelector('.contact-avatar');
-                    if (avatar && user.avatar_url) {
-                        avatar.innerHTML = `<img src="${user.avatar_url}" alt="${user.username}"><div class="online-dot ${user.is_online ? 'online' : 'offline'}"></div>`;
-                    }
-                    
-                    // Обновляем статус
-                    const lastMsg = item.querySelector('.contact-lastmsg');
-                    if (lastMsg) {
-                        lastMsg.textContent = user.is_online ? 'В сети' : 'Был(а) ' + (user.last_seen ? new Date(user.last_seen).toLocaleString() : 'давно');
-                    }
-                    
-                    // Обновляем verified
-                    const icon = nameEl.querySelector('.verified-icon');
-                    if (user.verified && !icon) {
-                        const newIcon = document.createElement('i');
-                        newIcon.className = 'fas fa-check-circle verified-icon';
-                        nameEl.appendChild(newIcon);
-                    } else if (!user.verified && icon) {
-                        icon.remove();
-                    }
-                }
-            });
         }
 
         // ============================================
@@ -1272,13 +1452,14 @@
             profileUsername.value = currentUser.username;
             profileDisplayName.value = currentUser.display_name || currentUser.username;
             profileAvatarInput.value = currentUser.avatar_url || '';
-            updateProfileAvatarPreview(currentUser.avatar_url);
+            profileStatus.value = currentUser.status || 'online';
+            updateProfileAvatar(currentUser.avatar_url);
             profileModal.style.display = 'flex';
         }
 
-        function updateProfileAvatarPreview(url) {
+        function updateProfileAvatar(url) {
             if (url) {
-                profileAvatarPreview.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
+                profileAvatarPreview.innerHTML = `<img src="${url}" alt="avatar">`;
             } else {
                 profileAvatarPreview.innerHTML = '<i class="fas fa-user"></i>';
             }
@@ -1288,76 +1469,84 @@
             if (!currentUser) return;
             const displayName = profileDisplayName.value.trim() || currentUser.username;
             const avatarUrl = profileAvatarInput.value.trim();
+            const status = profileStatus.value;
 
             try {
-                const { error } = await supabaseClient
+                await supabase
                     .from('users')
                     .update({
                         display_name: displayName,
-                        avatar_url: avatarUrl || null
+                        avatar_url: avatarUrl || null,
+                        status: status
                     })
                     .eq('id', currentUser.id);
 
-                if (error) throw error;
-
                 currentUser.display_name = displayName;
                 currentUser.avatar_url = avatarUrl;
+                currentUser.status = status;
                 currentUsernameDisplay.textContent = displayName;
                 saveSession(currentUser);
-                updateProfileAvatarPreview(avatarUrl);
-                loadContacts();
+                updateProfileAvatar(avatarUrl);
+                await loadChats();
                 profileModal.style.display = 'none';
 
-            } catch (error) {
-                console.error('Ошибка сохранения:', error);
-                alert('Ошибка сохранения: ' + error.message);
+            } catch (e) {
+                console.error('Ошибка:', e);
+                alert('Ошибка сохранения: ' + e.message);
             }
         }
 
         // ============================================
-        // ОБРАБОТЧИКИ СОБЫТИЙ
+        // ВКЛАДКИ
         // ============================================
-        loginBtn.onclick = () => {
-            const username = authUsername.value.trim();
-            const password = authPassword.value.trim();
-            loginUser(username, password);
-        };
+        document.querySelectorAll('.chat-tabs button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.chat-tabs button').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentTab = btn.dataset.tab;
+                renderChatList();
+            });
+        });
 
+        // ============================================
+        // ОБРАБОТЧИКИ
+        // ============================================
+        loginBtn.onclick = () => loginUser(authUsername.value.trim(), authPassword.value.trim());
         registerBtn.onclick = registerUser;
         logoutBtn.onclick = logout;
         sendBtn.onclick = sendMessage;
         messageInput.onkeydown = (e) => { if (e.key === 'Enter') sendMessage(); };
         clearChatBtn.onclick = clearChat;
         deleteChatBtn.onclick = deleteChat;
+        createChatBtn.onclick = openCreateChat;
+        createChatCloseBtn.onclick = () => createChatModal.style.display = 'none';
+        createChatBtnAction.onclick = createChat;
         profileBtn.onclick = openProfile;
         profileCloseBtn.onclick = () => profileModal.style.display = 'none';
         profileSaveBtn.onclick = saveProfile;
-        profileAvatarInput.oninput = () => updateProfileAvatarPreview(profileAvatarInput.value);
+        profileAvatarInput.oninput = () => updateProfileAvatar(profileAvatarInput.value);
+
+        // Закрытие модалок по клику вне
+        profileModal.onclick = (e) => { if (e.target === profileModal) profileModal.style.display = 'none'; };
+        createChatModal.onclick = (e) => { if (e.target === createChatModal) createChatModal.style.display = 'none'; };
 
         // ============================================
         // ИНИЦИАЛИЗАЦИЯ
         // ============================================
         window.onload = function() {
             console.log('🍔 Burgergram загружен!');
-            
-            // Восстановление сессии
-            const savedSession = loadSession();
-            if (savedSession) {
-                currentUser = savedSession;
+
+            const saved = loadSession();
+            if (saved) {
+                currentUser = saved;
                 currentUsernameDisplay.textContent = currentUser.display_name || currentUser.username;
                 enterMainScreen();
-                updateOnlineStatus(true);
+                supabase.from('users').update({ is_online: true }).eq('id', currentUser.id);
             }
 
-            // Проверка подключения
-            supabaseClient.from('users').select('count').limit(1)
+            supabase.from('users').select('count').limit(1)
                 .then(() => console.log('✅ Подключено к Supabase'))
-                .catch(err => console.error('❌ Ошибка подключения:', err));
-        };
-
-        // Закрытие модалки по клику вне
-        profileModal.onclick = (e) => {
-            if (e.target === profileModal) profileModal.style.display = 'none';
+                .catch(e => console.error('❌ Ошибка:', e));
         };
     </script>
 </body>
