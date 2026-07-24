@@ -433,7 +433,7 @@
         }
 
         // ============================================
-        // ЗАГРУЗКА ЧАТОВ - ИСПРАВЛЕННАЯ ВЕРСИЯ
+        // ЗАГРУЗКА ЧАТОВ
         // ============================================
         async function loadChats() {
             if (!currentUser) return;
@@ -834,14 +834,13 @@
         }
 
         // ============================================
-        // СОЗДАНИЕ ЧАТА - ИСПРАВЛЕННАЯ ВЕРСИЯ
+        // СОЗДАНИЕ ЧАТА
         // ============================================
         function openCreateChat() {
             createChatModal.style.display = 'flex';
             createChatName.value = '';
             createChatUser.value = '';
             createChatError.style.display = 'none';
-            // Показываем/скрываем поле названия в зависимости от типа
             toggleChatNameField();
         }
 
@@ -895,15 +894,13 @@
 
                 if (type === 'private') {
                     // Проверяем, есть ли уже чат между этими пользователями
-                    const { data: existingChats, error: eError } = await sb
+                    const { data: existingChats } = await sb
                         .from('chat_members')
                         .select('chat_id')
                         .eq('user_id', currentUser.id);
 
-                    if (eError) throw eError;
-
                     let existingChatId = null;
-                    for (let member of existingChats) {
+                    for (let member of existingChats || []) {
                         const { data: otherMember } = await sb
                             .from('chat_members')
                             .select('user_id')
@@ -918,7 +915,6 @@
                     }
 
                     if (existingChatId) {
-                        // Чат уже существует, открываем его
                         createChatModal.style.display = 'none';
                         await loadChats();
                         setTimeout(() => openChat(existingChatId), 500);
