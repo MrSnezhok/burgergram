@@ -32,8 +32,9 @@
         
         .sidebar { width: 280px; background: #16213e; border-right: 1px solid #2a3a5e; display: flex; flex-direction: column; flex-shrink: 0; }
         .sidebar-header { padding: 12px 14px; border-bottom: 1px solid #2a3a5e; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px; }
-        .sidebar-header h3 { font-weight: 700; font-size: 17px; color: #fff; }
+        .sidebar-header h3 { font-weight: 700; font-size: 17px; color: #fff; cursor: pointer; display: flex; align-items: center; gap: 6px; }
         .sidebar-header h3 i { color: #f5a623; }
+        .sidebar-header h3:hover { opacity: 0.8; }
         .sidebar-header .user-badge { background: #1a2a4e; padding: 4px 8px 4px 6px; border-radius: 10px; font-size: 11px; display: flex; align-items: center; gap: 4px; color: #c8d4e6; cursor: pointer; transition: 0.15s; border: 1px solid transparent; }
         .sidebar-header .user-badge:hover { border-color: #4f8cf7; }
         .logout-btn { background: none; border: none; color: #8899bb; font-size: 15px; cursor: pointer; padding: 4px 6px; border-radius: 10px; transition: 0.15s; }
@@ -55,10 +56,14 @@
         .contact-avatar .status-dot.online { background: #4ade80; }
         .contact-avatar .status-dot.offline { background: #666; }
         .contact-avatar .status-dot.typing { background: #f5a623; animation: pulse 1s infinite; }
+        .contact-avatar .vip-badge { position: absolute; top: -2px; right: -2px; background: #f5a623; color: #1a1a2e; border-radius: 50%; width: 16px; height: 16px; font-size: 8px; display: flex; align-items: center; justify-content: center; border: 2px solid #16213e; font-weight: 700; }
+        .contact-avatar .crown-badge { position: absolute; top: -2px; left: -2px; color: #f5a623; font-size: 12px; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
         .contact-info { flex: 1; overflow: hidden; min-width: 0; }
         .contact-name { font-weight: 500; color: #e8edf5; display: flex; align-items: center; gap: 4px; font-size: 14px; flex-wrap: wrap; }
         .contact-name .verified-icon { color: #4ade80; font-size: 11px; }
+        .contact-name .vip-icon { color: #f5a623; font-size: 11px; font-weight: 700; }
+        .contact-name .crown-icon { color: #f5a623; font-size: 12px; }
         .contact-name .chat-type-badge { font-size: 9px; background: #2a3a5e; padding: 1px 6px; border-radius: 8px; color: #8899bb; }
         .contact-lastmsg { font-size: 12px; color: #8899bb; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .contact-time { font-size: 10px; color: #667799; margin-left: auto; flex-shrink: 0; }
@@ -75,11 +80,15 @@
         .messages-container { flex: 1; overflow-y: auto; padding: 10px 14px; display: flex; flex-direction: column; gap: 4px; }
         .message-wrapper { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 4px; }
         .message-wrapper.own { flex-direction: row-reverse; }
-        .message-wrapper .msg-avatar { width: 32px; height: 32px; border-radius: 50%; background: #2a3a5e; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #b8ccf0; font-size: 13px; flex-shrink: 0; overflow: hidden; }
+        .message-wrapper .msg-avatar { width: 32px; height: 32px; border-radius: 50%; background: #2a3a5e; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #b8ccf0; font-size: 13px; flex-shrink: 0; overflow: hidden; position: relative; }
         .message-wrapper .msg-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .message-wrapper .msg-avatar .vip-badge { position: absolute; bottom: -2px; right: -2px; background: #f5a623; color: #1a1a2e; border-radius: 50%; width: 14px; height: 14px; font-size: 7px; display: flex; align-items: center; justify-content: center; border: 2px solid #0d1b2a; font-weight: 700; }
+        .message-wrapper .msg-avatar .crown-badge { position: absolute; top: -2px; left: -2px; color: #f5a623; font-size: 10px; }
         .message-wrapper .msg-content { max-width: 70%; display: flex; flex-direction: column; }
-        .message-wrapper .msg-content .msg-sender { font-size: 11px; font-weight: 600; color: #8899bb; margin-bottom: 2px; }
-        .message-wrapper.own .msg-content .msg-sender { color: #b6ceff; text-align: right; }
+        .message-wrapper .msg-content .msg-sender { font-size: 11px; font-weight: 600; color: #8899bb; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+        .message-wrapper.own .msg-content .msg-sender { color: #b6ceff; text-align: right; justify-content: flex-end; }
+        .message-wrapper .msg-content .msg-sender .vip-icon { color: #f5a623; font-size: 10px; font-weight: 700; }
+        .message-wrapper .msg-content .msg-sender .crown-icon { color: #f5a623; font-size: 11px; }
         .message { padding: 8px 12px; border-radius: 14px; font-size: 14px; line-height: 1.4; word-wrap: break-word; background: #1a2a4e; color: #e3eaf3; align-self: flex-start; position: relative; }
         .message-wrapper.own .message { background: #4f8cf7; color: #fff; }
         .message .msg-time { font-size: 9px; opacity: 0.6; margin-top: 2px; text-align: right; }
@@ -95,9 +104,18 @@
         .chat-input-area button:disabled { opacity: 0.5; cursor: not-allowed; }
         .empty-chat { color: #667799; text-align: center; margin-top: 40px; font-size: 14px; }
         
-        .notification { position: fixed; bottom: 20px; right: 20px; background: #16213e; border: 1px solid #4f8cf7; border-radius: 12px; padding: 12px 16px; max-width: 300px; color: #e0e0e0; box-shadow: 0 8px 30px rgba(0,0,0,0.6); animation: slideIn 0.3s ease; z-index: 999; display: none; }
-        .notification.show { display: block; }
-        @keyframes slideIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        /* Модалка списка пользователей */
+        #users-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1001; justify-content: center; align-items: center; padding: 16px; }
+        .users-modal-content { background: #16213e; border-radius: 20px; padding: 24px; max-width: 400px; width: 100%; max-height: 80vh; overflow-y: auto; border: 1px solid #2a3a5e; }
+        .users-modal-content h3 { color: #fff; margin-bottom: 16px; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+        .users-modal-content .user-item { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-bottom: 1px solid #2a3a5e; }
+        .users-modal-content .user-item .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: #2a3a5e; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #b8ccf0; font-size: 14px; overflow: hidden; flex-shrink: 0; }
+        .users-modal-content .user-item .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .users-modal-content .user-item .user-name { flex: 1; color: #e8edf5; }
+        .users-modal-content .user-item .user-status { font-size: 12px; color: #8899bb; }
+        .users-modal-content .user-item .user-status.online { color: #4ade80; }
+        .users-modal-content .close-btn { background: none; border: none; color: #8899bb; font-size: 20px; cursor: pointer; padding: 4px 8px; }
+        .users-modal-content .close-btn:hover { color: #f0f4fa; }
         
         #profile-modal, #create-chat-modal, #add-members-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; padding: 16px; }
         .modal-content { background: #16213e; border-radius: 20px; padding: 24px; max-width: 380px; width: 100%; border: 1px solid #2a3a5e; max-height: 90vh; overflow-y: auto; }
@@ -136,8 +154,8 @@
             .message-wrapper .msg-content { max-width: 85%; }
             .message { font-size: 13px; padding: 6px 10px; }
             .chat-header .chat-partner { font-size: 13px; }
-            .notification { max-width: 90%; right: 5%; bottom: 10px; }
             .message-wrapper .msg-avatar { width: 28px; height: 28px; font-size: 11px; }
+            .users-modal-content { max-width: 95%; }
         }
         
         @media (max-width: 480px) {
@@ -182,7 +200,7 @@
             <div class="messenger-layout">
                 <div class="sidebar">
                     <div class="sidebar-header">
-                        <h3><i class="fas fa-hamburger"></i> Burgergram</h3>
+                        <h3 id="burger-menu"><i class="fas fa-hamburger"></i> Burgergram</h3>
                         <div style="display:flex;align-items:center;gap:3px;">
                             <span class="user-badge" id="profile-btn">
                                 <i class="fas fa-user-circle"></i> <span id="current-username-display"></span>
@@ -221,6 +239,17 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Модалка списка пользователей -->
+    <div id="users-modal">
+        <div class="users-modal-content">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <h3><i class="fas fa-users" style="color:#4f8cf7;"></i> Пользователи в сети</h3>
+                <button class="close-btn" id="users-modal-close">&times;</button>
+            </div>
+            <div id="users-list-modal"></div>
         </div>
     </div>
 
@@ -317,8 +346,9 @@
         let channel = null;
         let chatMessages = {};
         let typingTimeout = null;
-        let isTyping = false;
-        let typingInterval = null;
+
+        // Базовая аватарка по умолчанию
+        const DEFAULT_AVATAR = 'data:image/jpeg;base64,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';
 
         // ============================================
         // DOM
@@ -343,9 +373,10 @@
         const deleteChatBtn = $('delete-chat-btn');
         const createChatBtn = $('create-chat-btn');
         const addMembersBtn = $('add-members-btn');
-        const notification = $('notification');
-        const notifTitle = $('notif-title');
-        const notifBody = $('notif-body');
+        const burgerMenu = $('burger-menu');
+        const usersModal = $('users-modal');
+        const usersListModal = $('users-list-modal');
+        const usersModalClose = $('users-modal-close');
 
         const profileBtn = $('profile-btn');
         const profileModal = $('profile-modal');
@@ -382,11 +413,7 @@
         function hideMsg() { authMessage.style.display = 'none'; }
 
         function showNotif(title, body) {
-            notifTitle.textContent = title;
-            notifBody.textContent = body;
-            notification.classList.add('show');
-            setTimeout(() => notification.classList.remove('show'), 5000);
-            
+            // Браузерное уведомление
             if ('Notification' in window && Notification.permission === 'granted') {
                 new Notification('🍔 Burgergram', {
                     body: `${title}: ${body}`,
@@ -434,6 +461,16 @@
             return '⚫ был(а) ' + formatLastSeen(user.last_seen);
         }
 
+        function getAvatar(user) {
+            if (!user) return DEFAULT_AVATAR;
+            return user.avatar_url || DEFAULT_AVATAR;
+        }
+
+        function getInitials(name) {
+            if (!name) return '?';
+            return name.charAt(0).toUpperCase();
+        }
+
         // ============================================
         // АВТОРИЗАЦИЯ
         // ============================================
@@ -452,7 +489,8 @@
 
                 const { error } = await sb.from('users').insert([{
                     username, password, display_name: username,
-                    verified: false, is_online: true, last_seen: new Date().toISOString()
+                    verified: false, is_online: true, last_seen: new Date().toISOString(),
+                    avatar_url: DEFAULT_AVATAR, vip: false
                 }]);
                 if (error) throw error;
 
@@ -506,10 +544,6 @@
                 await sb.removeChannel(channel);
                 channel = null;
             }
-            if (typingInterval) {
-                clearInterval(typingInterval);
-                typingInterval = null;
-            }
             currentUser = null; currentChatId = null;
             saveSession(null);
             authScreen.style.display = 'flex';
@@ -547,6 +581,7 @@
                     });
                     updateStatusIndicators();
                     updateChatHeaderStatus();
+                    updateUsersModal();
                 }
             }, 5000);
         }
@@ -584,6 +619,7 @@
             nameEl.innerHTML = `
                 ${name}
                 ${partner.verified ? '<i class="fas fa-check-circle verified-icon" style="color:#4ade80;font-size:12px;"></i>' : ''}
+                ${partner.vip ? '<span class="vip-icon" style="color:#f5a623;font-size:12px;font-weight:700;">👑 VIP</span>' : ''}
                 <span class="status-text">${statusText}</span>
             `;
         }
@@ -615,7 +651,7 @@
                     if (currentChatId === msg.chat_id) {
                         const sender = allUsers.find(u => u.id === msg.sender_id);
                         const senderName = sender?.display_name || sender?.username || 'Собеседник';
-                        appendMessage(msg.content, false, senderName, msg.created_at, msg.id, sender?.avatar_url);
+                        appendMessage(msg.content, false, senderName, msg.created_at, msg.id, sender);
                         chatMessages[currentChatId] = messagesContainer.innerHTML;
                     }
 
@@ -628,12 +664,6 @@
                             chatName = partner?.display_name || partner?.username || 'Чат';
                         }
                         showNotif(chatName, msg.content);
-                        
-                        try {
-                            const audio = new Audio('https://cdnjs.cloudflare.com/ajax/libs/ion-sound/3.0.7/sounds/bell.mp3');
-                            audio.volume = 0.3;
-                            audio.play().catch(() => {});
-                        } catch (e) {}
                     }
                 })
                 .subscribe((status) => {
@@ -692,7 +722,7 @@
 
                 const { data: users } = await sb
                     .from('users')
-                    .select('id, username, display_name, avatar_url, verified, is_online, last_seen');
+                    .select('id, username, display_name, avatar_url, verified, is_online, last_seen, vip');
                 allUsers = users || [];
 
                 for (let chat of chats) {
@@ -752,6 +782,9 @@
                 let partner = null;
                 let chatName = chat.name || 'Чат';
                 let isChatTyping = false;
+                let isVip = false;
+                let isVerified = false;
+                let isCreator = false;
                 
                 if (chat.type === 'private') {
                     const member = chat.chat_members?.find(m => m.user_id !== currentUser.id);
@@ -759,18 +792,21 @@
                         partner = allUsers.find(u => u.id === member.user_id);
                         chatName = partner?.display_name || partner?.username || 'Unknown';
                         isChatTyping = member.is_typing || false;
+                        isVip = partner?.vip || false;
+                        isVerified = partner?.verified || false;
                     }
                 } else {
-                    // Для групп проверяем, печатает ли кто-то
                     const typingMembers = chat.chat_members?.filter(m => m.user_id !== currentUser.id && m.is_typing) || [];
                     isChatTyping = typingMembers.length > 0;
+                    // Проверяем, является ли пользователь создателем
+                    isCreator = chat.created_by === currentUser.id;
                 }
 
                 const avatar = document.createElement('div');
                 avatar.className = 'contact-avatar';
                 const avatarUrl = chat.type === 'private' ? partner?.avatar_url : chat.avatar_url;
                 
-                if (avatarUrl) {
+                if (avatarUrl && avatarUrl !== DEFAULT_AVATAR) {
                     avatar.innerHTML = `<img src="${avatarUrl}" alt="${chatName}">`;
                 } else {
                     avatar.textContent = chatName.charAt(0).toUpperCase();
@@ -786,6 +822,22 @@
                 }
                 avatar.appendChild(dot);
 
+                // VIP бейдж
+                if (isVip) {
+                    const vipBadge = document.createElement('div');
+                    vipBadge.className = 'vip-badge';
+                    vipBadge.textContent = 'VIP';
+                    avatar.appendChild(vipBadge);
+                }
+
+                // Корона для создателя группы
+                if (isCreator && chat.type === 'group') {
+                    const crownBadge = document.createElement('div');
+                    crownBadge.className = 'crown-badge';
+                    crownBadge.innerHTML = '👑';
+                    avatar.appendChild(crownBadge);
+                }
+
                 const info = document.createElement('div');
                 info.className = 'contact-info';
 
@@ -799,10 +851,22 @@
                     badge.textContent = 'Группа';
                     nameDiv.appendChild(badge);
                 }
-                if (partner?.verified) {
+                if (isVerified) {
                     const icon = document.createElement('i');
                     icon.className = 'fas fa-check-circle verified-icon';
                     nameDiv.appendChild(icon);
+                }
+                if (isVip) {
+                    const vipIcon = document.createElement('span');
+                    vipIcon.className = 'vip-icon';
+                    vipIcon.textContent = '👑 VIP';
+                    nameDiv.appendChild(vipIcon);
+                }
+                if (isCreator && chat.type === 'group') {
+                    const crownIcon = document.createElement('span');
+                    crownIcon.className = 'crown-icon';
+                    crownIcon.innerHTML = '👑';
+                    nameDiv.appendChild(crownIcon);
                 }
 
                 const lastMsg = document.createElement('div');
@@ -854,25 +918,34 @@
 
             let partner = null;
             let chatName = chat.name || 'Чат';
+            let isVip = false;
+            let isVerified = false;
+            let isCreator = false;
             
             if (chat.type === 'private') {
                 const member = chat.chat_members?.find(m => m.user_id !== currentUser.id);
                 if (member) {
                     partner = allUsers.find(u => u.id === member.user_id);
                     chatName = partner?.display_name || partner?.username || 'Чат';
+                    isVip = partner?.vip || false;
+                    isVerified = partner?.verified || false;
                 }
+            } else {
+                isCreator = chat.created_by === currentUser.id;
             }
 
+            let statusText = '';
             if (partner) {
-                const statusText = getStatusText(partner);
-                chatPartnerName.innerHTML = `
-                    ${chatName}
-                    ${partner.verified ? '<i class="fas fa-check-circle verified-icon" style="color:#4ade80;font-size:12px;"></i>' : ''}
-                    <span class="status-text">${statusText}</span>
-                `;
-            } else {
-                chatPartnerName.innerHTML = chatName;
+                statusText = getStatusText(partner);
             }
+
+            chatPartnerName.innerHTML = `
+                ${chatName}
+                ${isVerified ? '<i class="fas fa-check-circle verified-icon" style="color:#4ade80;font-size:12px;"></i>' : ''}
+                ${isVip ? '<span class="vip-icon" style="color:#f5a623;font-size:12px;font-weight:700;">👑 VIP</span>' : ''}
+                ${isCreator && chat.type === 'group' ? '<span style="color:#f5a623;font-size:12px;">👑 Создатель</span>' : ''}
+                ${partner ? `<span class="status-text">${statusText}</span>` : ''}
+            `;
 
             await sb
                 .from('chat_members')
@@ -918,7 +991,7 @@
                     const isOwn = msg.sender_id === currentUser.id;
                     const sender = allUsers.find(u => u.id === msg.sender_id);
                     const senderName = isOwn ? 'Вы' : (sender?.display_name || sender?.username || 'Неизвестный');
-                    appendMessage(msg.content, isOwn, senderName, msg.created_at, msg.id, sender?.avatar_url);
+                    appendMessage(msg.content, isOwn, senderName, msg.created_at, msg.id, sender);
                 });
 
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -927,26 +1000,58 @@
             } catch (e) { console.error('Ошибка загрузки:', e); }
         }
 
-        function appendMessage(text, isOwn, senderName, timestamp, msgId, avatarUrl) {
+        function appendMessage(text, isOwn, senderName, timestamp, msgId, sender) {
             const wrapper = document.createElement('div');
             wrapper.className = `message-wrapper ${isOwn ? 'own' : ''}`;
 
             const avatar = document.createElement('div');
             avatar.className = 'msg-avatar';
-            if (avatarUrl) {
+            const avatarUrl = sender?.avatar_url;
+            if (avatarUrl && avatarUrl !== DEFAULT_AVATAR) {
                 avatar.innerHTML = `<img src="${avatarUrl}" alt="${senderName}">`;
             } else {
                 avatar.textContent = senderName.charAt(0).toUpperCase();
             }
+
+            // VIP бейдж на аватарке
+            if (sender?.vip) {
+                const vipBadge = document.createElement('div');
+                vipBadge.className = 'vip-badge';
+                vipBadge.textContent = 'VIP';
+                avatar.appendChild(vipBadge);
+            }
+
+            // Корона на аватарке для создателя группы
+            if (sender && currentChatId) {
+                const chat = allChats.find(c => c.id === currentChatId);
+                if (chat && chat.type === 'group' && chat.created_by === sender.id) {
+                    const crownBadge = document.createElement('div');
+                    crownBadge.className = 'crown-badge';
+                    crownBadge.innerHTML = '👑';
+                    avatar.appendChild(crownBadge);
+                }
+            }
+
             wrapper.appendChild(avatar);
 
             const content = document.createElement('div');
             content.className = 'msg-content';
 
-            const sender = document.createElement('div');
-            sender.className = 'msg-sender';
-            sender.textContent = senderName;
-            content.appendChild(sender);
+            const senderEl = document.createElement('div');
+            senderEl.className = 'msg-sender';
+            senderEl.innerHTML = senderName;
+            
+            // Добавляем VIP и корону к имени
+            if (sender?.vip) {
+                senderEl.innerHTML += ' <span class="vip-icon">👑 VIP</span>';
+            }
+            if (sender && currentChatId) {
+                const chat = allChats.find(c => c.id === currentChatId);
+                if (chat && chat.type === 'group' && chat.created_by === sender.id) {
+                    senderEl.innerHTML += ' <span class="crown-icon">👑</span>';
+                }
+            }
+            content.appendChild(senderEl);
 
             const msgDiv = document.createElement('div');
             msgDiv.className = 'message';
@@ -990,7 +1095,6 @@
             messageInput.disabled = true;
             sendBtn.disabled = true;
 
-            // Отключаем статус печатает
             await updateTypingStatus(false);
 
             try {
@@ -1007,8 +1111,7 @@
 
                 if (error) throw error;
                 
-                const sender = allUsers.find(u => u.id === currentUser.id);
-                appendMessage(text, true, 'Вы', data.created_at, data.id, sender?.avatar_url);
+                appendMessage(text, true, 'Вы', data.created_at, data.id, currentUser);
                 chatMessages[currentChatId] = messagesContainer.innerHTML;
                 
                 messageInput.disabled = false;
@@ -1032,11 +1135,7 @@
             
             messageInput.addEventListener('input', async () => {
                 if (!currentChatId) return;
-                
-                // Показываем у себя
                 typingStatus.textContent = '✏️ печатает...';
-                
-                // Отправляем статус печатает в базу
                 await updateTypingStatus(true);
                 
                 clearTimeout(typingTimeout);
@@ -1270,7 +1369,7 @@
             
             membersList.innerHTML = members.map(m => `
                 <div class="member-item">
-                    <span>${m.display_name || m.username}</span>
+                    <span>${m.display_name || m.username} ${m.vip ? '👑 VIP' : ''}</span>
                     ${m.id !== currentUser.id ? `<button class="remove-btn" onclick="removeMember('${m.id}')">✕</button>` : ''}
                 </div>
             `).join('');
@@ -1339,6 +1438,33 @@
         }
 
         // ============================================
+        // СПИСОК ПОЛЬЗОВАТЕЛЕЙ (БУРГЕР)
+        // ============================================
+        function openUsersModal() {
+            usersModal.style.display = 'flex';
+            updateUsersModal();
+        }
+
+        function updateUsersModal() {
+            const onlineUsers = allUsers.filter(u => u.is_online);
+            if (onlineUsers.length === 0) {
+                usersListModal.innerHTML = '<div style="color:#667799;text-align:center;padding:20px;">Нет пользователей в сети</div>';
+                return;
+            }
+
+            usersListModal.innerHTML = onlineUsers.map(u => `
+                <div class="user-item">
+                    <div class="user-avatar">
+                        ${(u.avatar_url && u.avatar_url !== DEFAULT_AVATAR) ? `<img src="${u.avatar_url}" alt="${u.username}">` : u.username.charAt(0).toUpperCase()}
+                        ${u.vip ? '<span style="position:absolute;bottom:-2px;right:-2px;background:#f5a623;color:#1a1a2e;border-radius:50%;width:14px;height:14px;font-size:7px;display:flex;align-items:center;justify-content:center;border:2px solid #16213e;font-weight:700;">VIP</span>' : ''}
+                    </div>
+                    <div class="user-name">${u.display_name || u.username}</div>
+                    <div class="user-status online">🟢 в сети</div>
+                </div>
+            `).join('');
+        }
+
+        // ============================================
         // ПРОФИЛЬ
         // ============================================
         function openProfile() {
@@ -1351,7 +1477,7 @@
         }
 
         function updateProfileAvatar(url) {
-            if (url) {
+            if (url && url !== DEFAULT_AVATAR) {
                 profileAvatarPreview.innerHTML = `<img src="${url}" alt="avatar">`;
             } else {
                 profileAvatarPreview.innerHTML = '<i class="fas fa-user"></i>';
@@ -1361,14 +1487,14 @@
         async function saveProfile() {
             if (!currentUser) return;
             const displayName = profileDisplayName.value.trim() || currentUser.username;
-            const avatarUrl = profileAvatarInput.value.trim();
+            const avatarUrl = profileAvatarInput.value.trim() || DEFAULT_AVATAR;
 
             try {
                 await sb
                     .from('users')
                     .update({
                         display_name: displayName,
-                        avatar_url: avatarUrl || null
+                        avatar_url: avatarUrl
                     })
                     .eq('id', currentUser.id);
 
@@ -1410,6 +1536,8 @@
         deleteChatBtn.onclick = deleteChat;
         createChatBtn.onclick = openCreateChat;
         addMembersBtn.onclick = openAddMembers;
+        burgerMenu.onclick = openUsersModal;
+        usersModalClose.onclick = () => usersModal.style.display = 'none';
         createChatCloseBtn.onclick = () => createChatModal.style.display = 'none';
         createChatBtnAction.onclick = createChat;
         addMembersCloseBtn.onclick = () => addMembersModal.style.display = 'none';
@@ -1422,6 +1550,7 @@
         profileModal.onclick = (e) => { if (e.target === profileModal) profileModal.style.display = 'none'; };
         createChatModal.onclick = (e) => { if (e.target === createChatModal) createChatModal.style.display = 'none'; };
         addMembersModal.onclick = (e) => { if (e.target === addMembersModal) addMembersModal.style.display = 'none'; };
+        usersModal.onclick = (e) => { if (e.target === usersModal) usersModal.style.display = 'none'; };
 
         // ============================================
         // ИНИЦИАЛИЗАЦИЯ
