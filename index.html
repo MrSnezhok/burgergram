@@ -36,7 +36,6 @@
             overflow: hidden;
         }
         
-        /* АВТОРИЗАЦИЯ */
         #auth-screen {
             display: flex;
             flex: 1;
@@ -149,7 +148,6 @@
             border-left: 3px solid #4ade80;
         }
         
-        /* ОСНОВНОЙ ИНТЕРФЕЙС */
         #main-screen {
             display: none;
             flex: 1;
@@ -389,7 +387,6 @@
 </head>
 <body>
     <div id="app">
-        <!-- АВТОРИЗАЦИЯ -->
         <div id="auth-screen">
             <div class="auth-card">
                 <h2>✉️ Мессенджер</h2>
@@ -408,7 +405,6 @@
             </div>
         </div>
 
-        <!-- ОСНОВНОЙ ЭКРАН -->
         <div id="main-screen">
             <div class="messenger-layout">
                 <div class="sidebar">
@@ -440,11 +436,13 @@
 
     <script>
         // ============================================
-        // ВАШИ ДАННЫЕ SUPABASE
+        // ВАШИ ДАННЫЕ SUPABASE (ОБНОВЛЕННЫЕ)
         // ============================================
         const SUPABASE_URL = 'https://qdmdkezsmxxihepkcqwc.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_hv8rO0WGe0lCujYEiPT3_A_duaiQ1rP';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // СОЗДАЕМ КЛИЕНТ - ТОЛЬКО ОДИН РАЗ!
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // ============================================
         // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
@@ -487,6 +485,8 @@
         // РЕГИСТРАЦИЯ
         // ============================================
         async function registerUser() {
+            console.log('🔵 Регистрация начата...');
+            
             const username = authUsername.value.trim();
             const password = authPassword.value.trim();
 
@@ -508,15 +508,17 @@
             hideMessage();
 
             try {
+                console.log('🔍 Проверка существования пользователя:', username);
+                
                 // Проверяем, существует ли пользователь
-                const { data: existing, error: checkError } = await supabase
+                const { data: existing, error: checkError } = await supabaseClient
                     .from('users')
                     .select('id')
                     .eq('username', username)
                     .maybeSingle();
 
                 if (checkError) {
-                    console.error('Ошибка проверки:', checkError);
+                    console.error('❌ Ошибка проверки:', checkError);
                     showMessage('❌ Ошибка проверки пользователя');
                     return;
                 }
@@ -526,8 +528,10 @@
                     return;
                 }
 
+                console.log('✅ Пользователь не найден, регистрируем...');
+
                 // Создаем пользователя
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('users')
                     .insert([
                         { 
@@ -540,11 +544,12 @@
                     .single();
 
                 if (error) {
-                    console.error('Ошибка регистрации:', error);
+                    console.error('❌ Ошибка регистрации:', error);
                     showMessage('❌ Ошибка регистрации: ' + error.message);
                     return;
                 }
 
+                console.log('✅ Пользователь зарегистрирован:', data);
                 showMessage('✅ Регистрация успешна! Выполняется вход...', 'success');
 
                 // Автоматический вход
@@ -553,7 +558,7 @@
                 }, 1000);
 
             } catch (error) {
-                console.error('Ошибка:', error);
+                console.error('❌ Критическая ошибка:', error);
                 showMessage('❌ Произошла ошибка: ' + error.message);
             }
         }
@@ -562,6 +567,8 @@
         // ВХОД
         // ============================================
         async function loginUser(username, password) {
+            console.log('🔵 Попытка входа...');
+            
             if (!username || !password) {
                 showMessage('❌ Введите логин и пароль');
                 return;
@@ -570,7 +577,7 @@
             hideMessage();
 
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('users')
                     .select('id, username')
                     .eq('username', username)
@@ -578,23 +585,26 @@
                     .maybeSingle();
 
                 if (error) {
-                    console.error('Ошибка входа:', error);
+                    console.error('❌ Ошибка входа:', error);
                     showMessage('❌ Ошибка входа: ' + error.message);
                     return;
                 }
 
                 if (!data) {
+                    console.log('❌ Пользователь не найден');
                     showMessage('❌ Неверный логин или пароль');
                     return;
                 }
 
+                console.log('✅ Вход выполнен:', data);
+                
                 // Успешный вход
                 currentUser = data;
                 currentUsernameDisplay.textContent = currentUser.username;
                 enterMainScreen();
 
             } catch (error) {
-                console.error('Ошибка:', error);
+                console.error('❌ Критическая ошибка:', error);
                 showMessage('❌ Произошла ошибка: ' + error.message);
             }
         }
@@ -603,6 +613,7 @@
         // ВХОД В ОСНОВНОЙ ИНТЕРФЕЙС
         // ============================================
         function enterMainScreen() {
+            console.log('🔄 Переход в основной интерфейс');
             authScreen.style.display = 'none';
             mainScreen.style.display = 'flex';
             loadContacts();
@@ -615,6 +626,7 @@
         // ВЫХОД
         // ============================================
         function logout() {
+            console.log('🔴 Выход');
             if (messagesSubscription) {
                 messagesSubscription.unsubscribe();
                 messagesSubscription = null;
@@ -638,13 +650,13 @@
             if (!currentUser) return;
 
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('users')
                     .select('id, username')
                     .neq('id', currentUser.id);
 
                 if (error) {
-                    console.error('Ошибка загрузки контактов:', error);
+                    console.error('❌ Ошибка загрузки контактов:', error);
                     return;
                 }
 
@@ -652,7 +664,7 @@
                 renderContactList();
 
             } catch (error) {
-                console.error('Ошибка:', error);
+                console.error('❌ Ошибка:', error);
             }
         }
 
@@ -734,14 +746,14 @@
             if (!currentUser || !otherUserId) return;
 
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('messages')
                     .select('*')
                     .or(`and(sender_id.eq.${currentUser.id}, receiver_id.eq.${otherUserId}),and(sender_id.eq.${otherUserId}, receiver_id.eq.${currentUser.id})`)
                     .order('created_at', { ascending: true });
 
                 if (error) {
-                    console.error('Ошибка загрузки сообщений:', error);
+                    console.error('❌ Ошибка загрузки сообщений:', error);
                     return;
                 }
 
@@ -761,7 +773,7 @@
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
             } catch (error) {
-                console.error('Ошибка:', error);
+                console.error('❌ Ошибка:', error);
             }
         }
 
@@ -802,7 +814,7 @@
             messageInput.value = '';
 
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('messages')
                     .insert([
                         {
@@ -816,7 +828,7 @@
                     .single();
 
                 if (error) {
-                    console.error('Ошибка отправки:', error);
+                    console.error('❌ Ошибка отправки:', error);
                     messageInput.value = text;
                     return;
                 }
@@ -824,7 +836,7 @@
                 appendMessage(text, true, 'Вы', data.created_at);
 
             } catch (error) {
-                console.error('Ошибка:', error);
+                console.error('❌ Ошибка:', error);
                 messageInput.value = text;
             }
         }
@@ -837,7 +849,7 @@
                 messagesSubscription.unsubscribe();
             }
 
-            messagesSubscription = supabase
+            messagesSubscription = supabaseClient
                 .channel('messages-channel')
                 .on('postgres_changes', {
                     event: 'INSERT',
@@ -864,31 +876,45 @@
         // ============================================
         // ОБРАБОТЧИКИ СОБЫТИЙ
         // ============================================
-        loginBtn.addEventListener('click', () => {
+        // Используем onclick вместо addEventListener для надежности
+        loginBtn.onclick = function(e) {
+            e.preventDefault();
+            console.log('🟢 Нажата кнопка Войти');
             const username = authUsername.value.trim();
             const password = authPassword.value.trim();
             loginUser(username, password);
-        });
+        };
 
-        registerBtn.addEventListener('click', registerUser);
+        registerBtn.onclick = function(e) {
+            e.preventDefault();
+            console.log('🟢 Нажата кнопка Регистрация');
+            registerUser();
+        };
 
-        logoutBtn.addEventListener('click', logout);
+        logoutBtn.onclick = function(e) {
+            e.preventDefault();
+            logout();
+        };
 
-        sendBtn.addEventListener('click', sendMessage);
+        sendBtn.onclick = function(e) {
+            e.preventDefault();
+            sendMessage();
+        };
         
-        messageInput.addEventListener('keydown', (e) => {
+        messageInput.onkeydown = function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 sendMessage();
             }
-        });
+        };
 
         // ============================================
         // ПРОВЕРКА ПОДКЛЮЧЕНИЯ
         // ============================================
         async function checkConnection() {
             try {
-                const { data, error } = await supabase
+                console.log('🔍 Проверка подключения к Supabase...');
+                const { data, error } = await supabaseClient
                     .from('users')
                     .select('count')
                     .limit(1);
@@ -904,17 +930,31 @@
                 console.log('💡 Таблицы: users, messages');
                 console.log('👤 Создайте пользователей через регистрацию');
                 
+                // Проверяем, есть ли пользователи
+                const { count, error: countError } = await supabaseClient
+                    .from('users')
+                    .select('*', { count: 'exact', head: true });
+                
+                if (!countError) {
+                    console.log(`👥 Всего пользователей: ${count}`);
+                }
+                
             } catch (error) {
-                console.error('❌ Ошибка:', error);
+                console.error('❌ Критическая ошибка:', error);
                 showMessage('❌ Ошибка подключения к Supabase');
             }
         }
 
         // Запускаем проверку при загрузке
-        checkConnection();
-
-        console.log('🚀 Мессенджер готов к работе!');
-        console.log('📝 Используйте регистрацию для создания пользователей');
+        window.onload = function() {
+            console.log('🚀 Мессенджер загружен!');
+            checkConnection();
+            
+            // Добавляем тестовые данные для удобства
+            console.log('💡 Для теста создайте пользователей:');
+            console.log('   - user1 / 123456');
+            console.log('   - user2 / 123456');
+        };
     </script>
 </body>
 </html>
