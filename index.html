@@ -244,16 +244,43 @@
             text-transform: uppercase;
             font-size: 18px;
             flex-shrink: 0;
+            position: relative;
+        }
+        
+        .contact-avatar .verified-badge {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            background: #4ade80;
+            color: #0b0e14;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #11171f;
         }
         
         .contact-info {
             flex: 1;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
         
         .contact-name {
             font-weight: 500;
             color: #e8edf5;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .contact-name .verified-icon {
+            color: #4ade80;
+            font-size: 12px;
         }
         
         .contact-lastmsg {
@@ -284,6 +311,14 @@
             font-weight: 500;
             font-size: 18px;
             color: #eef3fa;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .chat-header .chat-partner .verified-icon {
+            color: #4ade80;
+            font-size: 14px;
         }
         
         .messages-container {
@@ -436,12 +471,11 @@
 
     <script>
         // ============================================
-        // ВАШИ ДАННЫЕ SUPABASE (ОБНОВЛЕННЫЕ)
+        // ВАШИ ДАННЫЕ SUPABASE
         // ============================================
         const SUPABASE_URL = 'https://qdmdkezsmxxihepkcqwc.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_hv8rO0WGe0lCujYEiPT3_A_duaiQ1rP';
         
-        // СОЗДАЕМ КЛИЕНТ - ТОЛЬКО ОДИН РАЗ!
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // ============================================
@@ -451,6 +485,7 @@
         let currentChatUserId = null;
         let allUsers = [];
         let messagesSubscription = null;
+        let verifiedInterval = null;
 
         // DOM элементы
         const authScreen = document.getElementById('auth-screen');
@@ -508,9 +543,6 @@
             hideMessage();
 
             try {
-                console.log('🔍 Проверка существования пользователя:', username);
-                
-                // Проверяем, существует ли пользователь
                 const { data: existing, error: checkError } = await supabaseClient
                     .from('users')
                     .select('id')
@@ -528,15 +560,13 @@
                     return;
                 }
 
-                console.log('✅ Пользователь не найден, регистрируем...');
-
-                // Создаем пользователя
                 const { data, error } = await supabaseClient
                     .from('users')
                     .insert([
                         { 
                             username: username, 
                             password: password,
+                            verified: false,
                             created_at: new Date().toISOString()
                         }
                     ])
@@ -552,7 +582,6 @@
                 console.log('✅ Пользователь зарегистрирован:', data);
                 showMessage('✅ Регистрация успешна! Выполняется вход...', 'success');
 
-                // Автоматический вход
                 setTimeout(() => {
                     loginUser(username, password);
                 }, 1000);
@@ -579,7 +608,7 @@
             try {
                 const { data, error } = await supabaseClient
                     .from('users')
-                    .select('id, username')
+                    .select('id, username, verified')
                     .eq('username', username)
                     .eq('password', password)
                     .maybeSingle();
@@ -598,7 +627,6 @@
 
                 console.log('✅ Вход выполнен:', data);
                 
-                // Успешный вход
                 currentUser = data;
                 currentUsernameDisplay.textContent = currentUser.username;
                 enterMainScreen();
@@ -618,6 +646,7 @@
             mainScreen.style.display = 'flex';
             loadContacts();
             subscribeToMessages();
+            startVerifiedMonitoring();
             messageInput.disabled = false;
             sendBtn.disabled = false;
         }
@@ -630,6 +659,10 @@
             if (messagesSubscription) {
                 messagesSubscription.unsubscribe();
                 messagesSubscription = null;
+            }
+            if (verifiedInterval) {
+                clearInterval(verifiedInterval);
+                verifiedInterval = null;
             }
             currentUser = null;
             currentChatUserId = null;
@@ -644,6 +677,84 @@
         }
 
         // ============================================
+        // МОНИТОРИНГ СТАТУСА VERIFIED
+        // ============================================
+        function startVerifiedMonitoring() {
+            if (verifiedInterval) {
+                clearInterval(verifiedInterval);
+            }
+            
+            verifiedInterval = setInterval(async () => {
+                if (!currentUser) return;
+                
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('users')
+                        .select('id, username, verified')
+                        .neq('id', currentUser.id);
+
+                    if (error) {
+                        console.error('Ошибка обновления статусов:', error);
+                        return;
+                    }
+
+                    allUsers = data || [];
+                    updateContactStatuses();
+                    
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                }
+            }, 3000);
+        }
+
+        function updateContactStatuses() {
+            document.querySelectorAll('.contact-item').forEach(item => {
+                const nameElement = item.querySelector('.contact-name');
+                const avatarElement = item.querySelector('.contact-avatar');
+                
+                if (nameElement && avatarElement) {
+                    const username = nameElement.textContent.trim();
+                    const user = allUsers.find(u => u.username === username);
+                    
+                    if (user) {
+                        const verifiedBadge = avatarElement.querySelector('.verified-badge');
+                        if (user.verified) {
+                            if (!verifiedBadge) {
+                                const badge = document.createElement('div');
+                                badge.className = 'verified-badge';
+                                badge.innerHTML = '<i class="fas fa-check"></i>';
+                                avatarElement.appendChild(badge);
+                            }
+                            if (!nameElement.querySelector('.verified-icon')) {
+                                const icon = document.createElement('i');
+                                icon.className = 'fas fa-check-circle verified-icon';
+                                nameElement.appendChild(icon);
+                            }
+                        } else {
+                            if (verifiedBadge) {
+                                verifiedBadge.remove();
+                            }
+                            const icon = nameElement.querySelector('.verified-icon');
+                            if (icon) {
+                                icon.remove();
+                            }
+                        }
+                    }
+                }
+            });
+
+            if (currentChatUserId) {
+                const partner = allUsers.find(u => u.id === currentChatUserId);
+                if (partner) {
+                    chatPartnerName.innerHTML = `
+                        ${partner.username}
+                        ${partner.verified ? '<i class="fas fa-check-circle verified-icon" style="color:#4ade80;font-size:14px;"></i>' : ''}
+                    `;
+                }
+            }
+        }
+
+        // ============================================
         // ЗАГРУЗКА СПИСКА КОНТАКТОВ
         // ============================================
         async function loadContacts() {
@@ -652,7 +763,7 @@
             try {
                 const { data, error } = await supabaseClient
                     .from('users')
-                    .select('id, username')
+                    .select('id, username, verified')
                     .neq('id', currentUser.id);
 
                 if (error) {
@@ -684,6 +795,13 @@
                 const avatar = document.createElement('div');
                 avatar.className = 'contact-avatar';
                 avatar.textContent = user.username.charAt(0).toUpperCase();
+                
+                if (user.verified) {
+                    const badge = document.createElement('div');
+                    badge.className = 'verified-badge';
+                    badge.innerHTML = '<i class="fas fa-check"></i>';
+                    avatar.appendChild(badge);
+                }
 
                 const info = document.createElement('div');
                 info.className = 'contact-info';
@@ -691,6 +809,11 @@
                 const name = document.createElement('div');
                 name.className = 'contact-name';
                 name.textContent = user.username;
+                if (user.verified) {
+                    const icon = document.createElement('i');
+                    icon.className = 'fas fa-check-circle verified-icon';
+                    name.appendChild(icon);
+                }
 
                 const last = document.createElement('div');
                 last.className = 'contact-lastmsg';
@@ -717,20 +840,26 @@
             
             currentChatUserId = userId;
             
-            // Обновляем активный элемент
             document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
             const items = document.querySelectorAll('.contact-item');
             for (let i = 0; i < items.length; i++) {
                 const item = items[i];
                 const name = item.querySelector('.contact-name');
-                if (name && name.textContent === allUsers.find(u => u.id === userId)?.username) {
+                if (name && name.textContent.trim() === allUsers.find(u => u.id === userId)?.username) {
                     item.classList.add('active');
                     break;
                 }
             }
 
             const partner = allUsers.find(u => u.id === userId);
-            chatPartnerName.textContent = partner ? partner.username : 'Чат';
+            if (partner) {
+                chatPartnerName.innerHTML = `
+                    ${partner.username}
+                    ${partner.verified ? '<i class="fas fa-check-circle verified-icon" style="color:#4ade80;font-size:14px;"></i>' : ''}
+                `;
+            } else {
+                chatPartnerName.textContent = 'Чат';
+            }
             
             await loadMessages(userId);
             
@@ -809,9 +938,26 @@
         // ============================================
         async function sendMessage() {
             const text = messageInput.value.trim();
-            if (!text || !currentUser || !currentChatUserId) return;
             
+            if (!text) {
+                console.log('⚠️ Пустое сообщение');
+                return;
+            }
+            
+            if (!currentUser) {
+                console.log('⚠️ Пользователь не авторизован');
+                return;
+            }
+            
+            if (!currentChatUserId) {
+                console.log('⚠️ Чат не выбран');
+                return;
+            }
+            
+            console.log('📤 Отправка сообщения:', text);
             messageInput.value = '';
+            messageInput.disabled = true;
+            sendBtn.disabled = true;
 
             try {
                 const { data, error } = await supabaseClient
@@ -830,14 +976,23 @@
                 if (error) {
                     console.error('❌ Ошибка отправки:', error);
                     messageInput.value = text;
+                    messageInput.disabled = false;
+                    sendBtn.disabled = false;
+                    showMessage('❌ Ошибка отправки: ' + error.message);
                     return;
                 }
 
+                console.log('✅ Сообщение отправлено:', data);
                 appendMessage(text, true, 'Вы', data.created_at);
+                messageInput.disabled = false;
+                sendBtn.disabled = false;
+                messageInput.focus();
 
             } catch (error) {
-                console.error('❌ Ошибка:', error);
+                console.error('❌ Критическая ошибка:', error);
                 messageInput.value = text;
+                messageInput.disabled = false;
+                sendBtn.disabled = false;
             }
         }
 
@@ -857,6 +1012,7 @@
                     table: 'messages'
                 }, (payload) => {
                     const newMsg = payload.new;
+                    console.log('📩 Новое сообщение:', newMsg);
                     
                     if (currentUser && currentChatUserId) {
                         const isRelevant = 
@@ -870,13 +1026,14 @@
                         }
                     }
                 })
-                .subscribe();
+                .subscribe((status) => {
+                    console.log('📡 Realtime статус:', status);
+                });
         }
 
         // ============================================
         // ОБРАБОТЧИКИ СОБЫТИЙ
         // ============================================
-        // Используем onclick вместо addEventListener для надежности
         loginBtn.onclick = function(e) {
             e.preventDefault();
             console.log('🟢 Нажата кнопка Войти');
@@ -920,24 +1077,13 @@
                     .limit(1);
                 
                 if (error) {
-                    console.error('❌ Ошибка подключения к Supabase:', error);
-                    showMessage('❌ Не удалось подключиться к Supabase. Проверьте настройки.');
+                    console.error('❌ Ошибка подключения:', error);
+                    showMessage('❌ Не удалось подключиться к Supabase');
                     return;
                 }
                 
                 console.log('✅ Подключение к Supabase успешно!');
                 console.log('📊 Ваш проект:', SUPABASE_URL);
-                console.log('💡 Таблицы: users, messages');
-                console.log('👤 Создайте пользователей через регистрацию');
-                
-                // Проверяем, есть ли пользователи
-                const { count, error: countError } = await supabaseClient
-                    .from('users')
-                    .select('*', { count: 'exact', head: true });
-                
-                if (!countError) {
-                    console.log(`👥 Всего пользователей: ${count}`);
-                }
                 
             } catch (error) {
                 console.error('❌ Критическая ошибка:', error);
@@ -945,15 +1091,17 @@
             }
         }
 
-        // Запускаем проверку при загрузке
         window.onload = function() {
             console.log('🚀 Мессенджер загружен!');
             checkConnection();
-            
-            // Добавляем тестовые данные для удобства
             console.log('💡 Для теста создайте пользователей:');
             console.log('   - user1 / 123456');
             console.log('   - user2 / 123456');
+            console.log('💡 Система галочек (verified):');
+            console.log('   - Поле verified в таблице users');
+            console.log('   - Обновляется каждые 3 секунды');
+            console.log('📝 Чтобы поставить галочку выполните SQL:');
+            console.log('UPDATE public.users SET verified = true WHERE username = "ваш_пользователь";');
         };
     </script>
 </body>
