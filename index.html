@@ -234,13 +234,13 @@
                     <option value="channel">Канал</option>
                 </select>
             </div>
-            <div class="form-group" id="create-chat-name-group">
+            <div class="form-group" id="create-chat-name-group" style="display:none;">
                 <label>Название</label>
                 <input type="text" id="create-chat-name" placeholder="Название чата">
             </div>
-            <div class="form-group" id="create-chat-user-group">
-                <label>Пользователь (username)</label>
-                <input type="text" id="create-chat-user" placeholder="Имя пользователя">
+            <div class="form-group">
+                <label>Имя пользователя (username)</label>
+                <input type="text" id="create-chat-user" placeholder="Введите username">
             </div>
             <div style="color:#f79cb0;font-size:12px;display:none;" id="create-chat-error"></div>
             <div class="modal-actions">
@@ -252,25 +252,22 @@
 
     <script>
         // ============================================
-        // SUPABASE - ОДИН КЛИЕНТ!
+        // SUPABASE
         // ============================================
-        const _SUPABASE_URL = 'https://qdmdkezsmxxihepkcqwc.supabase.co';
-        const _SUPABASE_KEY = 'sb_publishable_hv8rO0WGe0lCujYEiPT3_A_duaiQ1rP';
-        const _sb = window.supabase.createClient(_SUPABASE_URL, _SUPABASE_KEY);
+        const SUPABASE_URL = 'https://qdmdkezsmxxihepkcqwc.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_hv8rO0WGe0lCujYEiPT3_A_duaiQ1rP';
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // ============================================
         // СОСТОЯНИЕ
         // ============================================
-        let _currentUser = null;
-        let _currentChatId = null;
-        let _currentTab = 'private';
-        let _allChats = [];
-        let _allUsers = [];
-        let _messagesSubscription = null;
-        let _typingTimeout = null;
-        let _isTyping = false;
-        let _notificationTimeout = null;
-        let _chatMessages = {}; // Кэш сообщений по чатам
+        let currentUser = null;
+        let currentChatId = null;
+        let currentTab = 'private';
+        let allChats = [];
+        let allUsers = [];
+        let messagesSubscription = null;
+        let chatMessages = {};
 
         // ============================================
         // DOM
@@ -330,8 +327,7 @@
             notifTitle.textContent = title;
             notifBody.textContent = body;
             notification.classList.add('show');
-            clearTimeout(_notificationTimeout);
-            _notificationTimeout = setTimeout(() => notification.classList.remove('show'), 4000);
+            setTimeout(() => notification.classList.remove('show'), 4000);
         }
 
         function saveSession(user) {
@@ -362,10 +358,10 @@
             hideMsg();
 
             try {
-                const { data: existing } = await _sb.from('users').select('id').eq('username', username).maybeSingle();
+                const { data: existing } = await sb.from('users').select('id').eq('username', username).maybeSingle();
                 if (existing) return showMsg('❌ Пользователь уже существует');
 
-                const { error } = await _sb.from('users').insert([{
+                const { error } = await sb.from('users').insert([{
                     username, password, display_name: username,
                     verified: false, is_online: true, last_seen: new Date().toISOString()
                 }]);
@@ -381,7 +377,7 @@
             hideMsg();
 
             try {
-                const { data, error } = await _sb
+                const { data, error } = await sb
                     .from('users')
                     .select('*')
                     .eq('username', username)
@@ -389,9 +385,9 @@
                     .maybeSingle();
                 if (error || !data) return showMsg('❌ Неверный логин или пароль');
 
-                _currentUser = data;
+                currentUser = data;
                 saveSession(data);
-                await _sb.from('users').update({ is_online: true, last_seen: new Date().toISOString() }).eq('id', data.id);
+                await sb.from('users').update({ is_online: true, last_seen: new Date().toISOString() }).eq('id', data.id);
                 currentUsernameDisplay.textContent = data.display_name || data.username;
                 enterMainScreen();
             } catch (e) { showMsg('❌ ' + e.message); }
@@ -412,11 +408,11 @@
         }
 
         async function logout() {
-            if (_currentUser) {
-                await _sb.from('users').update({ is_online: false, last_seen: new Date().toISOString() }).eq('id', _currentUser.id);
+            if (currentUser) {
+                await sb.from('users').update({ is_online: false, last_seen: new Date().toISOString() }).eq('id', currentUser.id);
             }
-            if (_messagesSubscription) { _messagesSubscription.unsubscribe(); _messagesSubscription = null; }
-            _currentUser = null; _currentChatId = null; _chatMessages = {};
+            if (messagesSubscription) { messagesSubscription.unsubscribe(); messagesSubscription = null; }
+            currentUser = null; currentChatId = null;
             saveSession(null);
             authScreen.style.display = 'flex';
             mainScreen.style.display = 'none';
@@ -430,42 +426,66 @@
 
         function startOnlinePing() {
             setInterval(async () => {
-                if (_currentUser) {
-                    await _sb.from('users').update({ is_online: true, last_seen: new Date().toISOString() }).eq('id', _currentUser.id);
+                if (currentUser) {
+                    await sb.from('users').update({ is_online: true, last_seen: new Date().toISOString() }).eq('id', currentUser.id);
                 }
             }, 30000);
         }
 
         // ============================================
-        // ЗАГРУЗКА ЧАТОВ
+        // ЗАГРУЗКА ЧАТОВ - ИСПРАВЛЕННАЯ ВЕРСИЯ
         // ============================================
         async function loadChats() {
-            if (!_currentUser) return;
+            if (!currentUser) return;
             try {
-                const { data: members, error: mError } = await _sb
+                console.log('🔄 Загрузка чатов...');
+                
+                // Получаем все чаты где пользователь участник
+                const { data: members, error: mError } = await sb
                     .from('chat_members')
                     .select('chat_id, role, last_read')
-                    .eq('user_id', _currentUser.id);
-                if (mError) throw mError;
+                    .eq('user_id', currentUser.id);
+
+                if (mError) {
+                    console.error('Ошибка загрузки участников:', mError);
+                    return;
+                }
 
                 const chatIds = members.map(m => m.chat_id);
+                
                 if (chatIds.length === 0) {
-                    _allChats = [];
+                    allChats = [];
                     renderChatList();
                     return;
                 }
 
-                const { data: chats, error: cError } = await _sb
+                // Получаем информацию о чатах
+                const { data: chats, error: cError } = await sb
                     .from('chats')
-                    .select('*, chat_members!inner(user_id, role), users!created_by(username, display_name)')
+                    .select('*')
                     .in('id', chatIds);
-                if (cError) throw cError;
 
-                const { data: users } = await _sb.from('users').select('id, username, display_name, avatar_url, verified, is_online, last_seen');
-                _allUsers = users || [];
+                if (cError) {
+                    console.error('Ошибка загрузки чатов:', cError);
+                    return;
+                }
 
+                // Получаем всех пользователей
+                const { data: users } = await sb
+                    .from('users')
+                    .select('id, username, display_name, avatar_url, verified, is_online, last_seen');
+                allUsers = users || [];
+
+                // Получаем участников для каждого чата
                 for (let chat of chats) {
-                    const { data: lastMsg } = await _sb
+                    const { data: chatMembers } = await sb
+                        .from('chat_members')
+                        .select('user_id, role')
+                        .eq('chat_id', chat.id);
+                    chat.chat_members = chatMembers || [];
+
+                    // Получаем последнее сообщение
+                    const { data: lastMsg } = await sb
                         .from('messages')
                         .select('*')
                         .eq('chat_id', chat.id)
@@ -474,32 +494,36 @@
                         .limit(1);
                     chat.last_message = lastMsg?.[0] || null;
 
+                    // Считаем непрочитанные
                     const member = members.find(m => m.chat_id === chat.id);
                     if (member) {
-                        const { count } = await _sb
+                        const { count } = await sb
                             .from('messages')
                             .select('*', { count: 'exact', head: true })
                             .eq('chat_id', chat.id)
                             .gt('created_at', member.last_read || new Date(0))
-                            .neq('sender_id', _currentUser.id)
+                            .neq('sender_id', currentUser.id)
                             .eq('is_deleted', false);
                         chat.unread_count = count || 0;
                     }
                 }
 
-                _allChats = chats;
+                allChats = chats;
+                console.log('✅ Загружено чатов:', allChats.length);
                 renderChatList();
 
-            } catch (e) { console.error('Ошибка загрузки чатов:', e); }
+            } catch (e) {
+                console.error('❌ Ошибка загрузки чатов:', e);
+            }
         }
 
         function renderChatList() {
-            const filtered = _allChats.filter(c => c.type === _currentTab);
+            const filtered = allChats.filter(c => c.type === currentTab);
             contactList.innerHTML = '';
 
             if (filtered.length === 0) {
                 contactList.innerHTML = `<div style="padding:20px;color:#667799;text-align:center;font-size:13px;">
-                    Нет ${_currentTab === 'private' ? 'личных' : _currentTab === 'group' ? 'групп' : 'каналов'}<br>
+                    Нет ${currentTab === 'private' ? 'личных' : currentTab === 'group' ? 'групп' : 'каналов'}<br>
                     <span style="font-size:11px;">Нажмите + для создания</span>
                 </div>`;
                 return;
@@ -508,22 +532,27 @@
             filtered.forEach(chat => {
                 const div = document.createElement('div');
                 div.className = 'contact-item';
-                if (_currentChatId === chat.id) div.classList.add('active');
+                if (currentChatId === chat.id) div.classList.add('active');
 
                 let partner = null;
+                let chatName = chat.name || 'Чат';
+                
                 if (chat.type === 'private') {
-                    const member = chat.chat_members.find(m => m.user_id !== _currentUser.id);
-                    if (member) partner = _allUsers.find(u => u.id === member.user_id);
+                    const member = chat.chat_members?.find(m => m.user_id !== currentUser.id);
+                    if (member) {
+                        partner = allUsers.find(u => u.id === member.user_id);
+                        chatName = partner?.display_name || partner?.username || 'Unknown';
+                    }
                 }
 
                 const avatar = document.createElement('div');
                 avatar.className = 'contact-avatar';
                 const avatarUrl = chat.type === 'private' ? partner?.avatar_url : chat.avatar_url;
-                const name = chat.type === 'private' ? (partner?.display_name || partner?.username || 'Unknown') : (chat.name || 'Чат');
+                
                 if (avatarUrl) {
-                    avatar.innerHTML = `<img src="${avatarUrl}" alt="${name}">`;
+                    avatar.innerHTML = `<img src="${avatarUrl}" alt="${chatName}">`;
                 } else {
-                    avatar.textContent = name.charAt(0).toUpperCase();
+                    avatar.textContent = chatName.charAt(0).toUpperCase();
                 }
 
                 if (chat.type === 'private' && partner) {
@@ -537,7 +566,8 @@
 
                 const nameDiv = document.createElement('div');
                 nameDiv.className = 'contact-name';
-                nameDiv.textContent = name;
+                nameDiv.textContent = chatName;
+                
                 if (chat.type !== 'private') {
                     const badge = document.createElement('span');
                     badge.className = 'chat-type-badge';
@@ -553,7 +583,7 @@
                 const lastMsg = document.createElement('div');
                 lastMsg.className = 'contact-lastmsg';
                 if (chat.last_message) {
-                    const sender = chat.last_message.sender_id === _currentUser.id ? 'Вы: ' : '';
+                    const sender = chat.last_message.sender_id === currentUser.id ? 'Вы: ' : '';
                     lastMsg.textContent = sender + chat.last_message.content;
                 } else {
                     lastMsg.textContent = 'Нет сообщений';
@@ -584,45 +614,46 @@
         }
 
         // ============================================
-        // ОТКРЫТЬ ЧАТ - С КЭШИРОВАНИЕМ
+        // ОТКРЫТЬ ЧАТ
         // ============================================
         async function openChat(chatId) {
-            if (!_currentUser || !chatId) return;
+            if (!currentUser || !chatId) return;
             
-            // Сохраняем текущие сообщения в кэш
-            if (_currentChatId && _chatMessages[_currentChatId]) {
-                _chatMessages[_currentChatId] = messagesContainer.innerHTML;
+            if (currentChatId && chatMessages[currentChatId]) {
+                chatMessages[currentChatId] = messagesContainer.innerHTML;
             }
 
-            _currentChatId = chatId;
-            const chat = _allChats.find(c => c.id === chatId);
+            currentChatId = chatId;
+            const chat = allChats.find(c => c.id === chatId);
             if (!chat) return;
 
             let partner = null;
+            let chatName = chat.name || 'Чат';
+            
             if (chat.type === 'private') {
-                const member = chat.chat_members.find(m => m.user_id !== _currentUser.id);
-                if (member) partner = _allUsers.find(u => u.id === member.user_id);
+                const member = chat.chat_members?.find(m => m.user_id !== currentUser.id);
+                if (member) {
+                    partner = allUsers.find(u => u.id === member.user_id);
+                    chatName = partner?.display_name || partner?.username || 'Чат';
+                }
             }
 
-            const name = chat.type === 'private' ? (partner?.display_name || partner?.username || 'Чат') : (chat.name || 'Чат');
             chatPartnerName.innerHTML = `
-                ${name}
+                ${chatName}
                 ${partner?.verified ? '<i class="fas fa-check-circle verified-icon" style="color:#4ade80;font-size:13px;"></i>' : ''}
                 <span style="font-size:11px;color:#8899bb;margin-left:6px;">
                     ${partner?.is_online ? '🟢' : '⚫'}
                 </span>
             `;
 
-            // Отмечаем прочитанными
-            await _sb
+            await sb
                 .from('chat_members')
                 .update({ last_read: new Date().toISOString() })
                 .eq('chat_id', chatId)
-                .eq('user_id', _currentUser.id);
+                .eq('user_id', currentUser.id);
 
-            // Проверяем кэш
-            if (_chatMessages[chatId]) {
-                messagesContainer.innerHTML = _chatMessages[chatId];
+            if (chatMessages[chatId]) {
+                messagesContainer.innerHTML = chatMessages[chatId];
             } else {
                 await loadMessages(chatId);
             }
@@ -630,8 +661,6 @@
             messageInput.disabled = false;
             sendBtn.disabled = false;
             messageInput.focus();
-            
-            // Обновляем список чатов для обновления счетчиков
             loadChats();
         }
 
@@ -641,7 +670,7 @@
         async function loadMessages(chatId) {
             if (!chatId) return;
             try {
-                const { data, error } = await _sb
+                const { data, error } = await sb
                     .from('messages')
                     .select('*')
                     .eq('chat_id', chatId)
@@ -658,16 +687,14 @@
                 }
 
                 data.forEach(msg => {
-                    const isOwn = msg.sender_id === _currentUser.id;
-                    const sender = _allUsers.find(u => u.id === msg.sender_id);
+                    const isOwn = msg.sender_id === currentUser.id;
+                    const sender = allUsers.find(u => u.id === msg.sender_id);
                     const senderName = isOwn ? 'Вы' : (sender?.display_name || sender?.username || 'Неизвестный');
                     appendMessage(msg.content, isOwn, senderName, msg.created_at, msg.id);
                 });
 
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                
-                // Сохраняем в кэш
-                _chatMessages[chatId] = messagesContainer.innerHTML;
+                chatMessages[chatId] = messagesContainer.innerHTML;
 
             } catch (e) { console.error('Ошибка загрузки:', e); }
         }
@@ -712,18 +739,18 @@
         // ============================================
         async function sendMessage() {
             const text = messageInput.value.trim();
-            if (!text || !_currentUser || !_currentChatId) return;
+            if (!text || !currentUser || !currentChatId) return;
 
             messageInput.value = '';
             messageInput.disabled = true;
             sendBtn.disabled = true;
 
             try {
-                const { data, error } = await _sb
+                const { data, error } = await sb
                     .from('messages')
                     .insert([{
-                        chat_id: _currentChatId,
-                        sender_id: _currentUser.id,
+                        chat_id: currentChatId,
+                        sender_id: currentUser.id,
                         content: text,
                         created_at: new Date().toISOString()
                     }])
@@ -732,15 +759,11 @@
 
                 if (error) throw error;
                 appendMessage(text, true, 'Вы', data.created_at, data.id);
-                
-                // Обновляем кэш
-                _chatMessages[_currentChatId] = messagesContainer.innerHTML;
+                chatMessages[currentChatId] = messagesContainer.innerHTML;
                 
                 messageInput.disabled = false;
                 sendBtn.disabled = false;
                 messageInput.focus();
-                
-                // Обновляем список чатов
                 loadChats();
 
             } catch (e) {
@@ -755,14 +778,14 @@
         // УДАЛЕНИЕ СООБЩЕНИЯ
         // ============================================
         async function deleteMessage(msgId) {
-            if (!msgId || !_currentUser) return;
+            if (!msgId || !currentUser) return;
             if (!confirm('Удалить сообщение?')) return;
 
             try {
-                await _sb.from('messages').update({ is_deleted: true }).eq('id', msgId).eq('sender_id', _currentUser.id);
+                await sb.from('messages').update({ is_deleted: true }).eq('id', msgId).eq('sender_id', currentUser.id);
                 const el = document.querySelector(`[data-msg-id="${msgId}"]`);
                 if (el) el.remove();
-                _chatMessages[_currentChatId] = messagesContainer.innerHTML;
+                chatMessages[currentChatId] = messagesContainer.innerHTML;
             } catch (e) { console.error('Ошибка:', e); }
         }
 
@@ -770,25 +793,25 @@
         // ОЧИСТКА/УДАЛЕНИЕ ЧАТА
         // ============================================
         async function clearChat() {
-            if (!_currentChatId) return;
+            if (!currentChatId) return;
             if (!confirm('Очистить историю чата?')) return;
             try {
-                await _sb.from('messages').update({ is_deleted: true }).eq('chat_id', _currentChatId);
-                _chatMessages[_currentChatId] = null;
-                await loadMessages(_currentChatId);
+                await sb.from('messages').update({ is_deleted: true }).eq('chat_id', currentChatId);
+                chatMessages[currentChatId] = null;
+                await loadMessages(currentChatId);
             } catch (e) { console.error('Ошибка:', e); }
         }
 
         async function deleteChat() {
-            if (!_currentChatId) return;
+            if (!currentChatId) return;
             if (!confirm('Удалить чат навсегда?')) return;
             try {
-                await _sb.from('messages').delete().eq('chat_id', _currentChatId);
-                await _sb.from('chat_members').delete().eq('chat_id', _currentChatId);
-                await _sb.from('chats').delete().eq('id', _currentChatId);
+                await sb.from('messages').delete().eq('chat_id', currentChatId);
+                await sb.from('chat_members').delete().eq('chat_id', currentChatId);
+                await sb.from('chats').delete().eq('id', currentChatId);
 
-                delete _chatMessages[_currentChatId];
-                _currentChatId = null;
+                delete chatMessages[currentChatId];
+                currentChatId = null;
                 messagesContainer.innerHTML = '<div class="empty-chat">🍔 Чат удален</div>';
                 chatPartnerName.textContent = 'Выберите чат';
                 document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
@@ -800,44 +823,41 @@
         // ТАЙПИНГ
         // ============================================
         function setupTyping() {
+            let typingTimeout = null;
             messageInput.addEventListener('input', () => {
-                if (!_isTyping && _currentChatId) {
-                    _isTyping = true;
-                    typingStatus.textContent = '✏️ печатает...';
-                    clearTimeout(_typingTimeout);
-                    _typingTimeout = setTimeout(() => {
-                        _isTyping = false;
-                        typingStatus.textContent = '';
-                    }, 2000);
-                }
+                typingStatus.textContent = '✏️ печатает...';
+                clearTimeout(typingTimeout);
+                typingTimeout = setTimeout(() => {
+                    typingStatus.textContent = '';
+                }, 2000);
             });
         }
 
         // ============================================
-        // СОЗДАНИЕ ЧАТА
+        // СОЗДАНИЕ ЧАТА - ИСПРАВЛЕННАЯ ВЕРСИЯ
         // ============================================
         function openCreateChat() {
             createChatModal.style.display = 'flex';
             createChatName.value = '';
             createChatUser.value = '';
             createChatError.style.display = 'none';
+            // Показываем/скрываем поле названия в зависимости от типа
+            toggleChatNameField();
         }
 
-        createChatType.addEventListener('change', () => {
-            document.getElementById('create-chat-name-group').style.display = createChatType.value === 'private' ? 'none' : 'block';
-            document.getElementById('create-chat-user-group').style.display = 'block';
-        });
+        function toggleChatNameField() {
+            const type = createChatType.value;
+            document.getElementById('create-chat-name-group').style.display = type === 'private' ? 'none' : 'block';
+        }
+
+        createChatType.addEventListener('change', toggleChatNameField);
 
         async function createChat() {
             const type = createChatType.value;
             const name = createChatName.value.trim();
             const username = createChatUser.value.trim();
 
-            if (type !== 'private' && !name) {
-                createChatError.textContent = '❌ Введите название';
-                createChatError.style.display = 'block';
-                return;
-            }
+            createChatError.style.display = 'none';
 
             if (!username) {
                 createChatError.textContent = '❌ Введите имя пользователя';
@@ -845,15 +865,28 @@
                 return;
             }
 
+            if (type !== 'private' && !name) {
+                createChatError.textContent = '❌ Введите название чата';
+                createChatError.style.display = 'block';
+                return;
+            }
+
             try {
-                const { data: user } = await _sb
+                // Находим пользователя
+                const { data: user, error: uError } = await sb
                     .from('users')
                     .select('id')
                     .eq('username', username)
                     .maybeSingle();
 
-                if (!user) {
+                if (uError || !user) {
                     createChatError.textContent = '❌ Пользователь не найден';
+                    createChatError.style.display = 'block';
+                    return;
+                }
+
+                if (user.id === currentUser.id) {
+                    createChatError.textContent = '❌ Нельзя создать чат с самим собой';
                     createChatError.style.display = 'block';
                     return;
                 }
@@ -861,29 +894,81 @@
                 let chatId;
 
                 if (type === 'private') {
-                    const { data, error } = await _sb.rpc('create_private_chat', {
-                        user1_id: _currentUser.id,
-                        user2_id: user.id
-                    });
-                    if (error) throw error;
-                    chatId = data;
-                } else {
-                    const { data, error } = await _sb
+                    // Проверяем, есть ли уже чат между этими пользователями
+                    const { data: existingChats, error: eError } = await sb
+                        .from('chat_members')
+                        .select('chat_id')
+                        .eq('user_id', currentUser.id);
+
+                    if (eError) throw eError;
+
+                    let existingChatId = null;
+                    for (let member of existingChats) {
+                        const { data: otherMember } = await sb
+                            .from('chat_members')
+                            .select('user_id')
+                            .eq('chat_id', member.chat_id)
+                            .eq('user_id', user.id)
+                            .maybeSingle();
+                        
+                        if (otherMember) {
+                            existingChatId = member.chat_id;
+                            break;
+                        }
+                    }
+
+                    if (existingChatId) {
+                        // Чат уже существует, открываем его
+                        createChatModal.style.display = 'none';
+                        await loadChats();
+                        setTimeout(() => openChat(existingChatId), 500);
+                        return;
+                    }
+
+                    // Создаем новый приватный чат
+                    const { data: newChat, error: cError } = await sb
                         .from('chats')
-                        .insert([{ name, type, created_by: _currentUser.id }])
+                        .insert([{
+                            name: '',
+                            type: 'private',
+                            created_by: currentUser.id
+                        }])
                         .select()
                         .single();
-                    if (error) throw error;
-                    chatId = data.id;
 
-                    await _sb.from('chat_members').insert([
-                        { chat_id: chatId, user_id: _currentUser.id, role: 'admin' }
+                    if (cError) throw cError;
+                    chatId = newChat.id;
+
+                    // Добавляем участников
+                    await sb.from('chat_members').insert([
+                        { chat_id: chatId, user_id: currentUser.id, role: 'admin' },
+                        { chat_id: chatId, user_id: user.id, role: 'member' }
                     ]);
-                    if (user) {
-                        await _sb.from('chat_members').insert([
-                            { chat_id: chatId, user_id: user.id, role: 'member' }
-                        ]);
-                    }
+
+                } else {
+                    // Создаем группу или канал
+                    const { data: newChat, error: cError } = await sb
+                        .from('chats')
+                        .insert([{
+                            name: name,
+                            type: type,
+                            created_by: currentUser.id
+                        }])
+                        .select()
+                        .single();
+
+                    if (cError) throw cError;
+                    chatId = newChat.id;
+
+                    // Добавляем создателя
+                    await sb.from('chat_members').insert([
+                        { chat_id: chatId, user_id: currentUser.id, role: 'admin' }
+                    ]);
+
+                    // Добавляем указанного пользователя
+                    await sb.from('chat_members').insert([
+                        { chat_id: chatId, user_id: user.id, role: 'member' }
+                    ]);
                 }
 
                 createChatModal.style.display = 'none';
@@ -891,7 +976,8 @@
                 setTimeout(() => openChat(chatId), 500);
 
             } catch (e) {
-                createChatError.textContent = '❌ ' + e.message;
+                console.error('Ошибка создания чата:', e);
+                createChatError.textContent = '❌ ' + (e.message || 'Ошибка создания чата');
                 createChatError.style.display = 'block';
             }
         }
@@ -900,9 +986,9 @@
         // ПОДПИСКА НА СООБЩЕНИЯ
         // ============================================
         function subscribeMessages() {
-            if (_messagesSubscription) _messagesSubscription.unsubscribe();
+            if (messagesSubscription) messagesSubscription.unsubscribe();
 
-            _messagesSubscription = _sb
+            messagesSubscription = sb
                 .channel('messages-channel')
                 .on('postgres_changes', {
                     event: 'INSERT',
@@ -912,22 +998,20 @@
                     const msg = payload.new;
                     if (msg.is_deleted) return;
 
-                    // Если сообщение в текущем чате
-                    if (_currentChatId === msg.chat_id && msg.sender_id !== _currentUser.id) {
-                        const sender = _allUsers.find(u => u.id === msg.sender_id);
+                    if (currentChatId === msg.chat_id && msg.sender_id !== currentUser.id) {
+                        const sender = allUsers.find(u => u.id === msg.sender_id);
                         const senderName = sender?.display_name || sender?.username || 'Собеседник';
                         appendMessage(msg.content, false, senderName, msg.created_at, msg.id);
-                        _chatMessages[_currentChatId] = messagesContainer.innerHTML;
+                        chatMessages[currentChatId] = messagesContainer.innerHTML;
                     }
 
-                    // Уведомление
-                    if (msg.sender_id !== _currentUser.id) {
-                        const chat = _allChats.find(c => c.id === msg.chat_id);
+                    if (msg.sender_id !== currentUser.id) {
+                        const chat = allChats.find(c => c.id === msg.chat_id);
                         if (chat) {
                             let name = chat.name;
                             if (chat.type === 'private') {
-                                const member = chat.chat_members.find(m => m.user_id !== _currentUser.id);
-                                const partner = _allUsers.find(u => u.id === member?.user_id);
+                                const member = chat.chat_members?.find(m => m.user_id !== currentUser.id);
+                                const partner = allUsers.find(u => u.id === member?.user_id);
                                 name = partner?.display_name || partner?.username || 'Чат';
                             }
                             showNotif(`📩 ${name}`, msg.content);
@@ -943,12 +1027,12 @@
         // ПРОФИЛЬ
         // ============================================
         function openProfile() {
-            if (!_currentUser) return;
-            profileUsername.value = _currentUser.username;
-            profileDisplayName.value = _currentUser.display_name || _currentUser.username;
-            profileAvatarInput.value = _currentUser.avatar_url || '';
-            profileStatus.value = _currentUser.status || 'online';
-            updateProfileAvatar(_currentUser.avatar_url);
+            if (!currentUser) return;
+            profileUsername.value = currentUser.username;
+            profileDisplayName.value = currentUser.display_name || currentUser.username;
+            profileAvatarInput.value = currentUser.avatar_url || '';
+            profileStatus.value = currentUser.status || 'online';
+            updateProfileAvatar(currentUser.avatar_url);
             profileModal.style.display = 'flex';
         }
 
@@ -961,26 +1045,26 @@
         }
 
         async function saveProfile() {
-            if (!_currentUser) return;
-            const displayName = profileDisplayName.value.trim() || _currentUser.username;
+            if (!currentUser) return;
+            const displayName = profileDisplayName.value.trim() || currentUser.username;
             const avatarUrl = profileAvatarInput.value.trim();
             const status = profileStatus.value;
 
             try {
-                await _sb
+                await sb
                     .from('users')
                     .update({
                         display_name: displayName,
                         avatar_url: avatarUrl || null,
                         status: status
                     })
-                    .eq('id', _currentUser.id);
+                    .eq('id', currentUser.id);
 
-                _currentUser.display_name = displayName;
-                _currentUser.avatar_url = avatarUrl;
-                _currentUser.status = status;
+                currentUser.display_name = displayName;
+                currentUser.avatar_url = avatarUrl;
+                currentUser.status = status;
                 currentUsernameDisplay.textContent = displayName;
-                saveSession(_currentUser);
+                saveSession(currentUser);
                 updateProfileAvatar(avatarUrl);
                 await loadChats();
                 profileModal.style.display = 'none';
@@ -998,7 +1082,7 @@
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.chat-tabs button').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                _currentTab = btn.dataset.tab;
+                currentTab = btn.dataset.tab;
                 renderChatList();
             });
         });
@@ -1021,7 +1105,6 @@
         profileSaveBtn.onclick = saveProfile;
         profileAvatarInput.oninput = () => updateProfileAvatar(profileAvatarInput.value);
 
-        // Закрытие модалок по клику вне
         profileModal.onclick = (e) => { if (e.target === profileModal) profileModal.style.display = 'none'; };
         createChatModal.onclick = (e) => { if (e.target === createChatModal) createChatModal.style.display = 'none'; };
 
@@ -1033,13 +1116,13 @@
 
             const saved = loadSession();
             if (saved) {
-                _currentUser = saved;
-                currentUsernameDisplay.textContent = _currentUser.display_name || _currentUser.username;
+                currentUser = saved;
+                currentUsernameDisplay.textContent = currentUser.display_name || currentUser.username;
                 enterMainScreen();
-                _sb.from('users').update({ is_online: true }).eq('id', _currentUser.id);
+                sb.from('users').update({ is_online: true }).eq('id', currentUser.id);
             }
 
-            _sb.from('users').select('count').limit(1)
+            sb.from('users').select('count').limit(1)
                 .then(() => console.log('✅ Подключено к Supabase'))
                 .catch(e => console.error('❌ Ошибка:', e));
         };
