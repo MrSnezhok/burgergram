@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мессенджер на Supabase</title>
+    <title>Burgergram - Мессенджер</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -61,6 +61,10 @@
             color: #f0f4fa;
         }
         
+        .auth-card h2 .burger-icon {
+            color: #f5a623;
+        }
+        
         .auth-card p.sub {
             color: #8e99ab;
             font-size: 14px;
@@ -88,8 +92,8 @@
         }
         
         .auth-card input:focus {
-            border-color: #4f8cf7;
-            box-shadow: 0 0 0 3px rgba(79, 140, 247, 0.2);
+            border-color: #f5a623;
+            box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.2);
         }
         
         .auth-card .actions {
@@ -100,18 +104,18 @@
         }
         
         .btn-primary {
-            background: #4f8cf7;
+            background: #f5a623;
             border: none;
             padding: 14px;
             border-radius: 60px;
             font-weight: 600;
-            color: #fff;
+            color: #0b0e14;
             font-size: 16px;
             cursor: pointer;
             transition: 0.15s;
         }
         
-        .btn-primary:hover { background: #3a73e0; transform: scale(0.98); }
+        .btn-primary:hover { background: #e09515; transform: scale(0.98); }
         
         .btn-outline {
             background: transparent;
@@ -178,9 +182,13 @@
         }
         
         .sidebar-header h3 {
-            font-weight: 500;
+            font-weight: 600;
             font-size: 18px;
-            color: #eef3fa;
+            color: #f5a623;
+        }
+        
+        .sidebar-header h3 i {
+            color: #f5a623;
         }
         
         .sidebar-header .user-badge {
@@ -194,7 +202,7 @@
             color: #c8d4e6;
         }
         
-        .sidebar-header .user-badge i { color: #4f8cf7; }
+        .sidebar-header .user-badge i { color: #f5a623; }
         
         .logout-btn {
             background: none;
@@ -228,7 +236,7 @@
         .contact-item:hover { background: #1b232e; }
         .contact-item.active {
             background: #1b232e;
-            border-left-color: #4f8cf7;
+            border-left-color: #f5a623;
         }
         
         .contact-avatar {
@@ -344,8 +352,8 @@
         }
         
         .message.own {
-            background: #2b6ef0;
-            color: white;
+            background: #f5a623;
+            color: #0b0e14;
             align-self: flex-end;
         }
         
@@ -356,7 +364,7 @@
             margin-bottom: 4px;
         }
         
-        .message.own .msg-sender { color: #b6ceff; }
+        .message.own .msg-sender { color: #7d5a0e; }
         
         .message .msg-time {
             font-size: 10px;
@@ -385,15 +393,15 @@
             outline: none;
         }
         
-        .chat-input-area input:focus { border-color: #4f8cf7; }
+        .chat-input-area input:focus { border-color: #f5a623; }
         
         .chat-input-area button {
-            background: #4f8cf7;
+            background: #f5a623;
             border: none;
             width: 50px;
             height: 50px;
             border-radius: 40px;
-            color: white;
+            color: #0b0e14;
             font-size: 20px;
             cursor: pointer;
             transition: 0.15s;
@@ -402,7 +410,7 @@
             justify-content: center;
         }
         
-        .chat-input-area button:hover { background: #3a73e0; }
+        .chat-input-area button:hover { background: #e09515; }
         
         .empty-chat {
             color: #6a7b90;
@@ -424,7 +432,7 @@
     <div id="app">
         <div id="auth-screen">
             <div class="auth-card">
-                <h2>✉️ Мессенджер</h2>
+                <h2>🍔 <span class="burger-icon">Burgergram</span></h2>
                 <p class="sub">Вход или регистрация через таблицу users</p>
                 <div id="auth-form">
                     <label><i class="fas fa-user"></i> Имя пользователя</label>
@@ -444,7 +452,7 @@
             <div class="messenger-layout">
                 <div class="sidebar">
                     <div class="sidebar-header">
-                        <h3><i class="fas fa-comment-dots" style="color:#4f8cf7;"></i> Чаты</h3>
+                        <h3><i class="fas fa-hamburger"></i> Burgergram</h3>
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <span class="user-badge"><i class="fas fa-user-circle"></i> <span id="current-username-display"></span></span>
                             <button class="logout-btn" id="logout-btn"><i class="fas fa-sign-out-alt"></i></button>
@@ -458,7 +466,7 @@
                         <div class="chat-partner" id="chat-partner-name">Выберите чат</div>
                     </div>
                     <div class="messages-container" id="messages-container">
-                        <div class="empty-chat">👋 Напишите сообщение</div>
+                        <div class="empty-chat">🍔 Напишите сообщение</div>
                     </div>
                     <div class="chat-input-area">
                         <input type="text" id="message-input" placeholder="Сообщение..." disabled>
@@ -669,7 +677,7 @@
             authScreen.style.display = 'flex';
             mainScreen.style.display = 'none';
             contactList.innerHTML = '';
-            messagesContainer.innerHTML = '<div class="empty-chat">👋 Выберите чат</div>';
+            messagesContainer.innerHTML = '<div class="empty-chat">🍔 Выберите чат</div>';
             chatPartnerName.textContent = 'Выберите чат';
             messageInput.disabled = true;
             sendBtn.disabled = true;
@@ -889,7 +897,7 @@
                 messagesContainer.innerHTML = '';
                 
                 if (!data || data.length === 0) {
-                    messagesContainer.innerHTML = '<div class="empty-chat">💬 Начните общение</div>';
+                    messagesContainer.innerHTML = '<div class="empty-chat">🍔 Начните общение</div>';
                     return;
                 }
 
@@ -934,7 +942,7 @@
         }
 
         // ============================================
-        // ОТПРАВКА СООБЩЕНИЯ
+        // ОТПРАВКА СООБЩЕНИЯ - ИСПРАВЛЕННАЯ ВЕРСИЯ
         // ============================================
         async function sendMessage() {
             const text = messageInput.value.trim();
@@ -946,11 +954,13 @@
             
             if (!currentUser) {
                 console.log('⚠️ Пользователь не авторизован');
+                showMessage('❌ Пользователь не авторизован');
                 return;
             }
             
             if (!currentChatUserId) {
                 console.log('⚠️ Чат не выбран');
+                showMessage('❌ Выберите чат для отправки');
                 return;
             }
             
@@ -960,25 +970,33 @@
             sendBtn.disabled = true;
 
             try {
+                const messageData = {
+                    sender_id: currentUser.id,
+                    receiver_id: currentChatUserId,
+                    content: text,
+                    created_at: new Date().toISOString()
+                };
+
+                console.log('📦 Данные для отправки:', messageData);
+
                 const { data, error } = await supabaseClient
                     .from('messages')
-                    .insert([
-                        {
-                            sender_id: currentUser.id,
-                            receiver_id: currentChatUserId,
-                            content: text,
-                            created_at: new Date().toISOString()
-                        }
-                    ])
+                    .insert([messageData])
                     .select()
                     .single();
 
                 if (error) {
                     console.error('❌ Ошибка отправки:', error);
+                    console.error('❌ Детали ошибки:', JSON.stringify(error, null, 2));
                     messageInput.value = text;
                     messageInput.disabled = false;
                     sendBtn.disabled = false;
-                    showMessage('❌ Ошибка отправки: ' + error.message);
+                    showMessage('❌ Ошибка отправки: ' + (error.message || 'Неизвестная ошибка'));
+                    
+                    // Если ошибка 401, показываем подсказку
+                    if (error.code === '401' || error.message.includes('permission')) {
+                        showMessage('❌ Нет прав для отправки. Выполните SQL для настройки политик');
+                    }
                     return;
                 }
 
@@ -987,12 +1005,14 @@
                 messageInput.disabled = false;
                 sendBtn.disabled = false;
                 messageInput.focus();
+                hideMessage();
 
             } catch (error) {
                 console.error('❌ Критическая ошибка:', error);
                 messageInput.value = text;
                 messageInput.disabled = false;
                 sendBtn.disabled = false;
+                showMessage('❌ Критическая ошибка: ' + (error.message || 'Неизвестная ошибка'));
             }
         }
 
@@ -1085,6 +1105,9 @@
                 console.log('✅ Подключение к Supabase успешно!');
                 console.log('📊 Ваш проект:', SUPABASE_URL);
                 
+                // Проверяем, есть ли политики
+                console.log('💡 Если сообщения не отправляются, выполните SQL для настройки политик');
+                
             } catch (error) {
                 console.error('❌ Критическая ошибка:', error);
                 showMessage('❌ Ошибка подключения к Supabase');
@@ -1092,7 +1115,7 @@
         }
 
         window.onload = function() {
-            console.log('🚀 Мессенджер загружен!');
+            console.log('🍔 Burgergram загружен!');
             checkConnection();
             console.log('💡 Для теста создайте пользователей:');
             console.log('   - user1 / 123456');
